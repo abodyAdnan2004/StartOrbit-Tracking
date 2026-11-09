@@ -1,7 +1,11 @@
 import { locationService } from '../service'
-import { useAuthStore } from '~/features/auth/store'
-import type { LocationDto, LocationFilters, UserLocation, TrackingCustomer, MapConfig } from '../types'
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import type {
+  LocationDto,
+  LocationFilters,
+  UserLocation,
+  TrackingCustomer,
+  MapConfig,
+} from '../types'
 
 export const useTrackingStore = defineStore('tracking', () => {
   const authStore = useAuthStore()
@@ -41,7 +45,7 @@ export const useTrackingStore = defineStore('tracking', () => {
 
   // Map configuration
   const mapConfig = ref<MapConfig>({
-    center: [40.7128, -74.0060] as [number, number], // Default to NYC
+    center: [40.7128, -74.006] as [number, number], // Default to NYC
     zoom: 13,
     maxZoom: 19,
     minZoom: 2,
@@ -106,14 +110,14 @@ export const useTrackingStore = defineStore('tracking', () => {
 
   const updateUserLocation = (data: UserLocation) => {
     // Update current user's location
-    if (data.userId === authStore.user?.id) {
+    if (data.userId === authStore.userData.value.id) {
       currentLocation.value = data
       // Update map center
       mapConfig.value.center = [data.latitude, data.longitude]
     }
 
     // Update user locations list
-    const index = userLocations.value.findIndex(u => u.userId === data.userId)
+    const index = userLocations.value.findIndex((u) => u.userId === data.userId)
     if (index >= 0) {
       userLocations.value[index] = data
     } else {
@@ -121,16 +125,16 @@ export const useTrackingStore = defineStore('tracking', () => {
     }
   }
 
-  const removeUserLocation = (userId: number) => {
-    userLocations.value = userLocations.value.filter(u => u.userId !== userId)
+  const removeUserLocation = (userId: string) => {
+    userLocations.value = userLocations.value.filter((u) => u.userId !== userId)
   }
 
   // Fetch current user's customers
   const loadCustomers = async () => {
-    if (!authStore.user?.id) return
+    if (!authStore.userData.value.id) return
     try {
       customersLoading.value = true
-      customers.value = await locationService.getCustomers(authStore.user.id)
+      customers.value = await locationService.getCustomers(authStore.userData.value.id)
     } catch (error) {
       console.error('Failed to load customers:', error)
     } finally {
@@ -140,11 +144,11 @@ export const useTrackingStore = defineStore('tracking', () => {
 
   // Load location history
   const loadHistory = async (page = 1) => {
-    if (!authStore.user?.id) return
+    if (!authStore.userData.value.id) return
     try {
       historyLoading.value = true
       filters.value.pageNumber = page
-      const response = await locationService.getByUser(authStore.user.id, filters.value)
+      const response = await locationService.getByUser(authStore.userData.value.id, filters.value)
       if (page === 1) {
         locationHistory.value = response.items
       } else {
@@ -160,10 +164,10 @@ export const useTrackingStore = defineStore('tracking', () => {
 
   // Load distance stats
   const loadDistanceStats = async (startDate?: string, endDate?: string) => {
-    if (!authStore.user?.id) return
+    if (!authStore.userData.value.id) return
     try {
       distanceStats.value = await locationService.getDistanceStats(
-        authStore.user.id,
+        authStore.userData.value.id,
         startDate,
         endDate
       )
@@ -185,7 +189,7 @@ export const useTrackingStore = defineStore('tracking', () => {
   onMounted(() => {
     if (authStore.token) {
       initSocket()
-      if (authStore.user?.role === 'admin' || authStore.user?.role === 'manager') {
+      if (authStore.userData.value.role === 'admin') {
         loadLatestLocations()
       } else {
         loadCustomers()

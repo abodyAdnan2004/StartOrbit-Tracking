@@ -21,7 +21,7 @@ const userData = computed(
 )
 const fullName = computed(() => userData.value.fullName || 'Sajad Salam')
 const role = computed(
-  () => userData.value.roles.map((role) => role.name).join(', ') || 'SuperAdmin'
+  () => userData.value.role
 )
 </script>
 

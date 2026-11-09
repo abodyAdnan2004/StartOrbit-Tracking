@@ -22,7 +22,6 @@ router.post('/login', async (req, res, next) => {
         ],
         isActive: true,
       },
-      include: { role: true },
     });
 
     if (!user) {
@@ -39,7 +38,7 @@ router.post('/login', async (req, res, next) => {
     const { accessToken, refreshToken } = generateTokens({
       id: user.id,
       username: user.username,
-      role: user.role.name,
+      role: user.role,
     });
 
     // Save refresh token
@@ -72,11 +71,11 @@ router.post('/login', async (req, res, next) => {
         fullName: user.fullName,
         phoneNumber: user.phoneNumber || '',
         roles: [{
-          name: user.role.name,
-          description: user.role.description || '',
-          isSystemRole: user.role.isSystemRole,
-          id: user.role.id,
-          isActive: user.role.isActive,
+          name: user.role,
+          description: '',
+          isSystemRole: false,
+          id: '0',
+          isActive: true,
         }],
         id: user.id,
         isActive: user.isActive,
@@ -111,16 +110,10 @@ router.post('/register', async (req, res, next) => {
     // Hash password
     const passwordHash = await hashPassword(data.password);
 
-    // Get default role if not provided
-    let roleId = data.roleId;
-    if (!roleId) {
-      const defaultRole = await prisma.role.findFirst({
-        where: { name: 'user' },
-      });
-      if (!defaultRole) {
-        throw new Error('Default role not found. Please run seed first.');
-      }
-      roleId = defaultRole.id;
+    // Validate role - only allow 'admin' or 'user'
+    const role = data.role || 'user';
+    if (!['admin', 'user'].includes(role)) {
+      throw new ValidationError('Invalid role. Must be "admin" or "user"');
     }
 
     // Create user
@@ -134,9 +127,8 @@ router.post('/register', async (req, res, next) => {
         lastName: data.lastName,
         fullName: `${data.firstName} ${data.lastName}`,
         phoneNumber: data.phoneNumber,
-        roleId,
+        role,
       },
-      include: { role: true },
     });
 
     res.status(201).json({
@@ -152,11 +144,11 @@ router.post('/register', async (req, res, next) => {
         fullName: user.fullName,
         phoneNumber: user.phoneNumber || '',
         roles: [{
-          name: user.role.name,
-          description: user.role.description || '',
-          isSystemRole: user.role.isSystemRole,
-          id: user.role.id,
-          isActive: user.role.isActive,
+          name: user.role,
+          description: '',
+          isSystemRole: false,
+          id: '0',
+          isActive: true,
         }],
         id: user.id,
         isActive: user.isActive,
@@ -181,7 +173,6 @@ router.get('/me', async (req, res, next) => {
 
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      include: { role: true },
     });
 
     if (!user || !user.isActive) {
@@ -198,11 +189,11 @@ router.get('/me', async (req, res, next) => {
         fullName: user.fullName,
         phoneNumber: user.phoneNumber || '',
         roles: [{
-          name: user.role.name,
-          description: user.role.description || '',
-          isSystemRole: user.role.isSystemRole,
-          id: user.role.id,
-          isActive: user.role.isActive,
+          name: user.role,
+          description: '',
+          isSystemRole: false,
+          id: '0',
+          isActive: true,
         }],
         id: user.id,
         isActive: user.isActive,
@@ -234,7 +225,6 @@ router.post('/refresh', async (req, res, next) => {
     // Get user
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      include: { role: true },
     });
 
     if (!user || !user.isActive) {
@@ -248,7 +238,7 @@ router.post('/refresh', async (req, res, next) => {
     const { accessToken, refreshToken: newRefreshToken } = generateTokens({
       id: user.id,
       username: user.username,
-      role: user.role.name,
+      role: user.role,
     });
 
     // Save new refresh token
@@ -275,11 +265,11 @@ router.post('/refresh', async (req, res, next) => {
         fullName: user.fullName,
         phoneNumber: user.phoneNumber || '',
         roles: [{
-          name: user.role.name,
-          description: user.role.description || '',
-          isSystemRole: user.role.isSystemRole,
-          id: user.role.id,
-          isActive: user.role.isActive,
+          name: user.role,
+          description: '',
+          isSystemRole: false,
+          id: '0',
+          isActive: true,
         }],
         id: user.id,
         isActive: user.isActive,

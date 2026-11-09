@@ -28,7 +28,7 @@ export default defineNuxtConfig({
     logLevel: 'error', // Suppress warnings
   },
   devServer: {
-    port: 3029,
+    port: 3065,
   },
   modules: ['@pinia/nuxt'],
   pinia: {

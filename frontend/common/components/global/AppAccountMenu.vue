@@ -5,8 +5,8 @@ const authStore = useAuthStore()
 const userData = computed(() => authStore.userData)
 const fullName = computed(() => userData.value.fullName || userData.value.username || '')
 const role = computed(() => {
-  if (userData.value.roles && userData.value.roles.length > 0) {
-    return userData.value.roles[0].name
+  if (userData.value.role && userData.value.role.length > 0) {
+    return userData.value.role
   }
   return ''
 })

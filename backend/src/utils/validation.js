@@ -15,7 +15,7 @@ export const registerSchema = z.object({
   firstName: z.string().min(1, 'First name is required').max(100),
   lastName: z.string().min(1, 'Last name is required').max(100),
   phoneNumber: z.string().optional(),
-  roleId: z.number().int().positive().optional(),
+  role: z.enum(['admin', 'user']).optional(),
 });
 
 export const changePasswordSchema = z.object({
@@ -36,7 +36,7 @@ export const createUserSchema = z.object({
   firstName: z.string().min(1, 'First name is required').max(100),
   lastName: z.string().min(1, 'Last name is required').max(100),
   phoneNumber: z.string().optional(),
-  roleId: z.number().int().positive(),
+  role: z.enum(['admin', 'user']).optional(),
   isActive: z.boolean().default(true),
 });
 
@@ -46,7 +46,7 @@ export const updateUserSchema = z.object({
   firstName: z.string().min(1).max(100).optional(),
   lastName: z.string().min(1).max(100).optional(),
   phoneNumber: z.string().optional(),
-  roleId: z.number().int().positive().optional(),
+  role: z.enum(['admin', 'user']).optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -71,6 +71,8 @@ export const updateCustomerSchema = z.object({
 });
 
 // Location validation schemas
+const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export const createLocationSchema = z.object({
   latitude: z.number().min(-90).max(90, 'Latitude must be between -90 and 90'),
   longitude: z.number().min(-180).max(180, 'Longitude must be between -180 and 180'),
@@ -78,13 +80,13 @@ export const createLocationSchema = z.object({
   accuracy: z.number().positive().optional(),
   speed: z.number().optional(),
   heading: z.number().min(0).max(360).optional(),
-  customerId: z.number().int().positive().optional(),
+  customerId: z.string().regex(uuidRegex).optional(),
   metadata: z.record(z.unknown()).optional(),
 });
 
 export const locationQuerySchema = z.object({
-  userId: z.number().int().positive().optional(),
-  customerId: z.number().int().positive().optional(),
+  userId: z.string().regex(uuidRegex).optional(),
+  customerId: z.string().regex(uuidRegex).optional(),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
   page: z.number().int().positive().default(1),
@@ -101,7 +103,7 @@ export const paginationSchema = z.object({
 
 export const userFiltersSchema = paginationSchema.extend({
   search: z.string().optional(),
-  roleId: z.number().int().positive().optional(),
+  role: z.enum(['admin', 'user']).optional(),
   isActive: z.boolean().optional(),
 });
 

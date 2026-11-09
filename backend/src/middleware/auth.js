@@ -17,7 +17,6 @@ export const authMiddleware = async (req, res, next) => {
     // Check if user exists and is active
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      include: { role: true },
     });
 
     if (!user || !user.isActive) {
@@ -34,8 +33,7 @@ export const authMiddleware = async (req, res, next) => {
       lastName: user.lastName,
       fullName: user.fullName,
       phoneNumber: user.phoneNumber,
-      role: user.role.name,
-      roleId: user.roleId,
+      role: user.role, // Now just a string: 'admin' or 'user'
     };
 
     next();
@@ -65,7 +63,6 @@ export const optionalAuth = async (req, res, next) => {
 
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      include: { role: true },
     });
 
     if (user && user.isActive) {
@@ -78,8 +75,7 @@ export const optionalAuth = async (req, res, next) => {
         lastName: user.lastName,
         fullName: user.fullName,
         phoneNumber: user.phoneNumber,
-        role: user.role.name,
-        roleId: user.roleId,
+        role: user.role, // Now just a string: 'admin' or 'user'
       };
     }
 

@@ -1,15 +1,15 @@
 // Location Types
 export interface Location {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   user?: {
-    id: number;
+    id: string;
     fullName: string;
     username: string;
   };
-  customerId?: number;
+  customerId?: string;
   customer?: {
-    id: number;
+    id: string;
     name: string;
   };
   latitude: number;
@@ -23,8 +23,8 @@ export interface Location {
 }
 
 export interface LocationFilters {
-  userId?: number;
-  customerId?: number;
+  userId?: string;
+  customerId?: string;
   startDate?: string;
   endDate?: string;
   page?: number;
@@ -32,7 +32,7 @@ export interface LocationFilters {
 }
 
 export interface LocationStats {
-  userId: number;
+  userId: string;
   totalDistanceMeters: number;
   totalDistanceKm: string;
   estimatedSteps: number;

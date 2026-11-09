@@ -10,7 +10,7 @@ const router = express.Router();
 // GET /api/users - Get all users with pagination and filters
 router.get('/', requireRole('admin', 'manager'), async (req, res, next) => {
   try {
-    const { page, limit, sortBy, sortOrder, search, roleId, isActive } = userFiltersSchema.parse(req.query);
+    const { page, limit, sortBy, sortOrder, search, role, isActive } = userFiltersSchema.parse(req.query);
 
     const where = {};
     if (search) {
@@ -21,13 +21,12 @@ router.get('/', requireRole('admin', 'manager'), async (req, res, next) => {
         { lastName: { contains: search, mode: 'insensitive' } },
       ];
     }
-    if (roleId) where.roleId = roleId;
+    if (role) where.role = role;
     if (typeof isActive === 'boolean') where.isActive = isActive;
 
     const [users, totalCount] = await Promise.all([
       prisma.user.findMany({
         where,
-        include: { role: true },
         orderBy: { [sortBy || 'createdAt']: sortOrder },
         skip: (page - 1) * limit,
         take: limit,
@@ -47,11 +46,11 @@ router.get('/', requireRole('admin', 'manager'), async (req, res, next) => {
         fullName: user.fullName,
         phoneNumber: user.phoneNumber || '',
         roles: [{
-          name: user.role.name,
-          description: user.role.description || '',
-          isSystemRole: user.role.isSystemRole,
-          id: user.role.id,
-          isActive: user.role.isActive,
+          name: user.role,
+          description: '',
+          isSystemRole: false,
+          id: '0',
+          isActive: true,
         }],
         id: user.id,
         isActive: user.isActive,
@@ -73,14 +72,15 @@ router.get('/', requireRole('admin', 'manager'), async (req, res, next) => {
 // GET /api/users/:id - Get user by ID
 router.get('/:id', requireRole('admin', 'manager'), async (req, res, next) => {
   try {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) {
-      return res.status(400).json({ error: 'Invalid user ID' });
+    const id = req.params.id;
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      return res.status(400).json({ error: 'Invalid user ID format' });
     }
 
     const user = await prisma.user.findUnique({
       where: { id },
-      include: { role: true },
     });
 
     if (!user) {
@@ -96,11 +96,11 @@ router.get('/:id', requireRole('admin', 'manager'), async (req, res, next) => {
       fullName: user.fullName,
       phoneNumber: user.phoneNumber || '',
       roles: [{
-        name: user.role.name,
-        description: user.role.description || '',
-        isSystemRole: user.role.isSystemRole,
-        id: user.role.id,
-        isActive: user.role.isActive,
+        name: user.role,
+        description: '',
+        isSystemRole: false,
+        id: '0',
+        isActive: true,
       }],
       id: user.id,
       isActive: user.isActive,
@@ -144,10 +144,9 @@ router.post('/', requireRole('admin'), async (req, res, next) => {
         lastName: data.lastName,
         fullName: `${data.firstName} ${data.lastName}`,
         phoneNumber: data.phoneNumber,
-        roleId: data.roleId,
+        role: data.role || 'user',
         isActive: data.isActive,
       },
-      include: { role: true },
     });
 
     res.status(201).json({
@@ -159,11 +158,11 @@ router.post('/', requireRole('admin'), async (req, res, next) => {
       fullName: user.fullName,
       phoneNumber: user.phoneNumber || '',
       roles: [{
-        name: user.role.name,
-        description: user.role.description || '',
-        isSystemRole: user.role.isSystemRole,
-        id: user.role.id,
-        isActive: user.role.isActive,
+        name: user.role,
+        description: '',
+        isSystemRole: false,
+        id: '0',
+        isActive: true,
       }],
       id: user.id,
       isActive: user.isActive,
@@ -176,9 +175,11 @@ router.post('/', requireRole('admin'), async (req, res, next) => {
 // PUT /api/users/:id - Update user
 router.put('/:id', requireRole('admin', 'manager'), async (req, res, next) => {
   try {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) {
-      return res.status(400).json({ error: 'Invalid user ID' });
+    const id = req.params.id;
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      return res.status(400).json({ error: 'Invalid user ID format' });
     }
 
     const data = updateUserSchema.parse(req.body);
@@ -218,7 +219,6 @@ router.put('/:id', requireRole('admin', 'manager'), async (req, res, next) => {
           ? `${data.firstName || existingUser.firstName} ${data.lastName || existingUser.lastName}`
           : undefined,
       },
-      include: { role: true },
     });
 
     res.json({
@@ -230,11 +230,11 @@ router.put('/:id', requireRole('admin', 'manager'), async (req, res, next) => {
       fullName: user.fullName,
       phoneNumber: user.phoneNumber || '',
       roles: [{
-        name: user.role.name,
-        description: user.role.description || '',
-        isSystemRole: user.role.isSystemRole,
-        id: user.role.id,
-        isActive: user.role.isActive,
+        name: user.role,
+        description: '',
+        isSystemRole: false,
+        id: '0',
+        isActive: true,
       }],
       id: user.id,
       isActive: user.isActive,
@@ -247,9 +247,11 @@ router.put('/:id', requireRole('admin', 'manager'), async (req, res, next) => {
 // DELETE /api/users/:id - Delete user (soft delete by setting isActive to false)
 router.delete('/:id', requireRole('admin'), async (req, res, next) => {
   try {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) {
-      return res.status(400).json({ error: 'Invalid user ID' });
+    const id = req.params.id;
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      return res.status(400).json({ error: 'Invalid user ID format' });
     }
 
     const user = await prisma.user.findUnique({ where: { id } });
@@ -272,9 +274,11 @@ router.delete('/:id', requireRole('admin'), async (req, res, next) => {
 // GET /api/users/:id/customers - Get customers assigned to a user
 router.get('/:id/customers', requireRole('admin', 'manager'), async (req, res, next) => {
   try {
-    const userId = parseInt(req.params.id);
-    if (isNaN(userId)) {
-      return res.status(400).json({ error: 'Invalid user ID' });
+    const userId = req.params.id;
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
+      return res.status(400).json({ error: 'Invalid user ID format' });
     }
 
     const { page, limit, sortBy, sortOrder, search, isActive } = userFiltersSchema.parse(req.query);

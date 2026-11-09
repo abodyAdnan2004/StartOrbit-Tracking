@@ -4,11 +4,11 @@ import type { UserDto, UserCreateDto, UserUpdateDto, UserFilters, ChangePassword
 
 interface IUserService {
   get: (filters: UserFilters) => Promise<PaginatedResponse<UserDto>>
-  getById: (id: number) => Promise<UserDto>
+  getById: (id: string) => Promise<UserDto>
   create: (data: UserCreateDto) => Promise<UserDto>
-  update: (id: number, data: UserUpdateDto) => Promise<UserDto>
-  delete: (id: number) => Promise<void>
-  changePassword: (id: number, data: ChangePasswordDto) => Promise<void>
+  update: (id: string, data: UserUpdateDto) => Promise<UserDto>
+  delete: (id: string) => Promise<void>
+  changePassword: (id: string, data: ChangePasswordDto) => Promise<void>
   getMe: () => Promise<UserDto>
 }
 
@@ -20,7 +20,7 @@ export class UserService implements IUserService {
     return response.data
   }
 
-  async getById(id: number): Promise<UserDto> {
+  async getById(id: string): Promise<UserDto> {
     const response = await axios.get<UserDto>(`/users/${id}`)
     return response.data
   }
@@ -30,16 +30,16 @@ export class UserService implements IUserService {
     return response.data
   }
 
-  async update(id: number, data: UserUpdateDto): Promise<UserDto> {
+  async update(id: string, data: UserUpdateDto): Promise<UserDto> {
     const response = await axios.put<UserDto>(`/users/${id}`, data)
     return response.data
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     await axios.delete(`/users/${id}`)
   }
 
-  async changePassword(id: number, data: ChangePasswordDto): Promise<void> {
+  async changePassword(id: string, data: ChangePasswordDto): Promise<void> {
     await axios.post(`/users/${id}/change-password`, data)
   }
 

@@ -10,47 +10,6 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting database seed...');
 
-  // Create roles
-  console.log('Creating roles...');
-  const roles = await Promise.all([
-    prisma.role.upsert({
-      where: { name: 'admin' },
-      update: {},
-      create: {
-        name: 'admin',
-        description: 'Full system access',
-        isSystemRole: true,
-        isActive: true,
-      },
-    }),
-    prisma.role.upsert({
-      where: { name: 'manager' },
-      update: {},
-      create: {
-        name: 'manager',
-        description: 'Manage users and customers, view reports',
-        isSystemRole: true,
-        isActive: true,
-      },
-    }),
-    prisma.role.upsert({
-      where: { name: 'user' },
-      update: {},
-      create: {
-        name: 'user',
-        description: 'Field user - can view assigned customers and send locations',
-        isSystemRole: true,
-        isActive: true,
-      },
-    }),
-  ]);
-
-  const adminRole = roles.find(r => r.name === 'admin');
-  const managerRole = roles.find(r => r.name === 'manager');
-  const userRole = roles.find(r => r.name === 'user');
-
-  console.log('✅ Roles created');
-
   // Hash password for test users
   const defaultPassword = await bcrypt.hash('password123', 12);
 
@@ -68,31 +27,11 @@ async function main() {
       lastName: 'User',
       fullName: 'Admin User',
       phoneNumber: '+1234567890',
-      roleId: adminRole.id,
+      role: 'admin',
       isActive: true,
     },
   });
   console.log('✅ Admin user created');
-
-  // Create manager user
-  console.log('Creating manager user...');
-  const manager = await prisma.user.upsert({
-    where: { username: 'manager' },
-    update: {},
-    create: {
-      employeeId: 1001,
-      username: 'manager',
-      email: 'manager@orbit-tracking.com',
-      passwordHash: defaultPassword,
-      firstName: 'Manager',
-      lastName: 'User',
-      fullName: 'Manager User',
-      phoneNumber: '+1234567891',
-      roleId: managerRole.id,
-      isActive: true,
-    },
-  });
-  console.log('✅ Manager user created');
 
   // Create field users
   console.log('Creating field users...');
@@ -109,7 +48,7 @@ async function main() {
         lastName: 'Doe',
         fullName: 'John Doe',
         phoneNumber: '+1234567892',
-        roleId: userRole.id,
+        role: 'user',
         isActive: true,
       },
     }),
@@ -125,7 +64,7 @@ async function main() {
         lastName: 'Smith',
         fullName: 'Jane Smith',
         phoneNumber: '+1234567893',
-        roleId: userRole.id,
+        role: 'user',
         isActive: true,
       },
     }),
@@ -141,7 +80,7 @@ async function main() {
         lastName: 'Wilson',
         fullName: 'Mike Wilson',
         phoneNumber: '+1234567894',
-        roleId: userRole.id,
+        role: 'user',
         isActive: true,
       },
     }),
@@ -157,7 +96,7 @@ async function main() {
         lastName: 'Jones',
         fullName: 'Sarah Jones',
         phoneNumber: '+1234567895',
-        roleId: userRole.id,
+        role: 'user',
         isActive: true,
       },
     }),
@@ -169,7 +108,7 @@ async function main() {
   const customers = await Promise.all([
     // John's customers
     prisma.customer.upsert({
-      where: { id: 1 },
+      where: { name: 'Acme Corporation' },
       update: {},
       create: {
         name: 'Acme Corporation',
@@ -182,7 +121,7 @@ async function main() {
       },
     }),
     prisma.customer.upsert({
-      where: { id: 2 },
+      where: { name: 'Globex Industries' },
       update: {},
       create: {
         name: 'Globex Industries',
@@ -195,7 +134,7 @@ async function main() {
       },
     }),
     prisma.customer.upsert({
-      where: { id: 3 },
+      where: { name: 'Wayne Enterprises' },
       update: {},
       create: {
         name: 'Wayne Enterprises',
@@ -210,7 +149,7 @@ async function main() {
 
     // Jane's customers
     prisma.customer.upsert({
-      where: { id: 4 },
+      where: { name: 'Stark Industries' },
       update: {},
       create: {
         name: 'Stark Industries',
@@ -223,7 +162,7 @@ async function main() {
       },
     }),
     prisma.customer.upsert({
-      where: { id: 5 },
+      where: { name: 'Oscorp' },
       update: {},
       create: {
         name: 'Oscorp',
@@ -238,7 +177,7 @@ async function main() {
 
     // Mike's customers
     prisma.customer.upsert({
-      where: { id: 6 },
+      where: { name: 'Daily Bugle' },
       update: {},
       create: {
         name: 'Daily Bugle',
@@ -251,7 +190,7 @@ async function main() {
       },
     }),
     prisma.customer.upsert({
-      where: { id: 7 },
+      where: { name: 'Roxxon Energy' },
       update: {},
       create: {
         name: 'Roxxon Energy',
@@ -266,7 +205,7 @@ async function main() {
 
     // Sarah's customers
     prisma.customer.upsert({
-      where: { id: 8 },
+      where: { name: 'Pym Technologies' },
       update: {},
       create: {
         name: 'Pym Technologies',
@@ -279,7 +218,7 @@ async function main() {
       },
     }),
     prisma.customer.upsert({
-      where: { id: 9 },
+      where: { name: 'Hammer Industries' },
       update: {},
       create: {
         name: 'Hammer Industries',
@@ -292,7 +231,7 @@ async function main() {
       },
     }),
     prisma.customer.upsert({
-      where: { id: 10 },
+      where: { name: 'Rand Enterprises' },
       update: {},
       create: {
         name: 'Rand Enterprises',
@@ -310,7 +249,6 @@ async function main() {
   console.log('\n🎉 Seed completed successfully!');
   console.log('\n📋 Test Credentials:');
   console.log('Admin:    admin / password123');
-  console.log('Manager:  manager / password123');
   console.log('Field:    john_doe / password123');
   console.log('Field:    jane_smith / password123');
   console.log('Field:    mike_wilson / password123');

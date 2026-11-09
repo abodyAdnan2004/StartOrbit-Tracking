@@ -11,8 +11,8 @@ interface CustomerState {
   // Actions
   loadCustomers: () => Promise<void>;
   createCustomer: (data: Partial<Customer>) => Promise<Customer>;
-  updateCustomer: (id: number, data: Partial<Customer>) => Promise<Customer>;
-  deleteCustomer: (id: number) => Promise<void>;
+  updateCustomer: (id: string, data: Partial<Customer>) => Promise<Customer>;
+  deleteCustomer: (id: string) => Promise<void>;
   setSearchQuery: (query: string) => void;
   clearError: () => void;
 }
@@ -48,7 +48,7 @@ export const useCustomerStore = create<CustomerState>((set, get) => ({
     }
   },
 
-  updateCustomer: async (id: number, data: Partial<Customer>) => {
+  updateCustomer: async (id: string, data: Partial<Customer>) => {
     set({ isLoading: true, error: null });
     try {
       const response = await api.put<Customer>(`/customers/${id}`, data);
@@ -63,7 +63,7 @@ export const useCustomerStore = create<CustomerState>((set, get) => ({
     }
   },
 
-  deleteCustomer: async (id: number) => {
+  deleteCustomer: async (id: string) => {
     set({ isLoading: true, error: null });
     try {
       await api.delete(`/customers/${id}`);

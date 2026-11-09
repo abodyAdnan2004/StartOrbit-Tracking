@@ -3,16 +3,16 @@ import type { BaseDto } from '~/common/utils/types/base-dto'
 
 // Location point DTO
 export interface LocationDto extends BaseDto {
-  id: number
-  userId: number
+  id: string
+  userId: string
   user?: {
-    id: number
+    id: string
     fullName: string
     username: string
   }
-  customerId?: number
+  customerId?: string
   customer?: {
-    id: number
+    id: string
     name: string
   }
   latitude: number
@@ -27,7 +27,7 @@ export interface LocationDto extends BaseDto {
 
 // Customer for tracking
 export interface TrackingCustomer {
-  id: number
+  id: string
   name: string
   latitude?: number | null
   longitude?: number | null
@@ -36,7 +36,7 @@ export interface TrackingCustomer {
 
 // User location for real-time tracking
 export interface UserLocation {
-  userId: number
+  userId: string
   userName: string
   latitude: number
   longitude: number
@@ -44,13 +44,13 @@ export interface UserLocation {
   speed?: number | null
   heading?: number | null
   timestamp: string
-  customerId?: number | null
+  customerId?: string | null
 }
 
 // Filters for location history
 export interface LocationFilters extends BaseFilters {
-  userId?: number | null
-  customerId?: number | null
+  userId?: string | null
+  customerId?: string | null
   startDate?: string | null
   endDate?: string | null
 }

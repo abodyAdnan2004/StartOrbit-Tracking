@@ -4,30 +4,33 @@ import AppAutoCompleteField from '~/common/components/app-field/AppAutoCompleteF
 import { requiredValidator, emailValidator, minLengthValidator } from '~/common/services/validation'
 import { Validator } from '~/common/services/validator'
 import { useUserStore } from '../store'
-import { useRoleStore } from '~/features/roles/store'
+// import { useRoleStore } from '~/features/roles/store'
 import type { UserUpdateDto, Role } from '../types'
 import type { ApiError } from '~/common/utils/types/ApiResponses'
-import { onMounted, watch } from 'vue'
 
 const store = useUserStore()
-const roleStore = useRoleStore()
+// const roleStore = useRoleStore()
 
 const validator = new Validator<UserUpdateDto>(
   {
+    id: null,
     username: '',
     email: '',
     firstName: '',
     lastName: '',
     phoneNumber: null,
-    roleId: 0,
+    role: null,
     isActive: true,
   },
   {
-    username: { required: requiredValidator('Username'), minLength: minLengthValidator(3) },
-    email: { required: requiredValidator('Email'), email: emailValidator() },
+    username: {
+      required: requiredValidator('Username'),
+      minLength: minLengthValidator('Username', 3),
+    },
+    email: { required: requiredValidator('Email'), email: emailValidator('Email') },
     firstName: { required: requiredValidator('First Name') },
     lastName: { required: requiredValidator('Last Name') },
-    roleId: { required: requiredValidator('Role') },
+    role: { required: requiredValidator('Role') },
   }
 )
 
@@ -36,9 +39,9 @@ const body = validator.validation
 const submit = async () => {
   if (!(await body.value.$validate())) return
   try {
-    await store.update({ ...validator.extractBody(), id: store.selectedItemId! })
+    await store.update({ ...validator.extractBody(), id: store.selectedItemId.value })
     validator.resetBody()
-    store.isEditDialogOpen = false
+    store.isEditDialogOpen.value = false
   } catch (error) {
     const errors = (error as ApiError).response?.data?.errors
     if (errors) validator.setExternalErrors(errors)
@@ -50,7 +53,7 @@ const resetForm = () => {
 }
 
 onMounted(async () => {
-  await roleStore.getAll()
+  //   await roleStore.getAll()
 })
 
 watch(
@@ -58,15 +61,15 @@ watch(
   async (val) => {
     if (val) {
       resetForm()
-      await roleStore.getAll()
+      //   await roleStore.getAll()
       if (store.selectedItem) {
-        body.value.username.$model = store.selectedItem.username
-        body.value.email.$model = store.selectedItem.email
-        body.value.firstName.$model = store.selectedItem.firstName
-        body.value.lastName.$model = store.selectedItem.lastName
-        body.value.phoneNumber.$model = store.selectedItem.phoneNumber
-        body.value.roleId.$model = store.selectedItem.roleId
-        body.value.isActive.$model = store.selectedItem.isActive
+        body.value.username.$model = store.selectedItem.value?.username
+        body.value.email.$model = store.selectedItem.value?.email
+        body.value.firstName.$model = store.selectedItem.value?.firstName
+        body.value.lastName.$model = store.selectedItem.value?.lastName
+        body.value.phoneNumber.$model = store.selectedItem.value?.phoneNumber
+        body.value.role.$model = store.selectedItem.value?.role
+        body.value.isActive.$model = store.selectedItem.value?.isActive
       }
     }
   }
@@ -74,9 +77,9 @@ watch(
 </script>
 
 <template>
-  <AppDialog v-model="store.isEditDialogOpen" title="Edit User" size="xl">
+  <AppDialog v-model="store.isEditDialogOpen.value" title="Edit User" size="xl">
     <div class="flex flex-col gap-4 p-3">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <AppInputField
           v-model="body.username.$model"
           :errors="body.username.$errors"
@@ -106,11 +109,11 @@ watch(
           v-model="body.phoneNumber.$model"
           :errors="body.phoneNumber.$errors"
           label="Phone Number"
-          type="tel"
+          type="phoneNumber"
         />
         <AppAutoCompleteField
-          v-model="body.roleId.$model"
-          :errors="body.roleId.$errors"
+          v-model="body.role.$model"
+          :errors="body.role.$errors"
           label="Role"
           :get-url="'/roles'"
           :fetch-on-search="false"
@@ -125,16 +128,16 @@ watch(
           type="checkbox"
           v-model="body.isActive.$model"
           id="isActiveEdit"
-          class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+          class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
         />
         <label for="isActiveEdit" class="text-sm font-medium text-gray-700">Active</label>
       </div>
     </div>
     <template #actions>
-      <BaseButton color="secondary" variant="outline" @click="store.isEditDialogOpen = false">
+      <BaseButton color="warning" variant="outline" @click="store.isEditDialogOpen.value = false">
         Cancel
       </BaseButton>
-      <BaseButton color="primary" :loading="store.isLoading" @click="submit">
+      <BaseButton color="primary" :loading="store.isLoading.value" @click="submit">
         <Icon name="ph:upload-simple-duotone" class="size-5" />
         Save
       </BaseButton>

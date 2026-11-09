@@ -20,8 +20,8 @@ export interface User {
   lastName: string
   fullName: string
   phoneNumber: string
-  roles: Role[]
-  id: number
+  role: string
+  id: string
   isActive: boolean
 }
 
@@ -29,7 +29,7 @@ export interface Role {
   name: string
   description: string
   isSystemRole: boolean
-  id: number
+  id: string
   isActive: boolean
 }
 

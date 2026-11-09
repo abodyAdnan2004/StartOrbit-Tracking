@@ -194,9 +194,11 @@ router.get('/latest', requireRole('admin', 'manager'), async (req, res, next) =>
 // GET /api/locations/user/:userId - Get locations for specific user
 router.get('/user/:userId', async (req, res, next) => {
   try {
-    const targetUserId = parseInt(req.params.userId);
-    if (isNaN(targetUserId)) {
-      return res.status(400).json({ error: 'Invalid user ID' });
+    const targetUserId = req.params.userId;
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(targetUserId)) {
+      return res.status(400).json({ error: 'Invalid user ID format' });
     }
 
     // Check authorization
@@ -247,9 +249,11 @@ router.get('/user/:userId', async (req, res, next) => {
 // GET /api/locations/stats/distance/:userId - Calculate distance walked for a user
 router.get('/stats/distance/:userId', async (req, res, next) => {
   try {
-    const targetUserId = parseInt(req.params.userId);
-    if (isNaN(targetUserId)) {
-      return res.status(400).json({ error: 'Invalid user ID' });
+    const targetUserId = req.params.userId;
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(targetUserId)) {
+      return res.status(400).json({ error: 'Invalid user ID format' });
     }
 
     // Check authorization

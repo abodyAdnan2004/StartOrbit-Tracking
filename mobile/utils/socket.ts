@@ -83,24 +83,24 @@ export interface SocketEvents {
   'disconnect': (reason: string) => void;
   'connect_error': (error: Error) => void;
   'authenticate': (token: string) => void;
-  'auth:success': (data: { userId: number; role: string; message: string }) => void;
+  'auth:success': (data: { userId: string; role: string; message: string }) => void;
   'auth:error': (data: { message: string }) => void;
   'location:update': (data: LocationUpdateData) => void;
   'location:batch': (locations: LocationUpdateData[]) => void;
-  'location:ack': (data: { id: number; timestamp: Date }) => void;
-  'location:batch:ack': (data: { count: number; ids: number[] }) => void;
-  'subscribe:user': (userId: number) => void;
-  'unsubscribe:user': (userId: number) => void;
+  'location:ack': (data: { id: string; timestamp: Date }) => void;
+  'location:batch:ack': (data: { count: number; ids: string[] }) => void;
+  'subscribe:user': (userId: string) => void;
+  'unsubscribe:user': (userId: string) => void;
   'get:online-users': () => void;
   'users:online': (users: OnlineUser[]) => void;
   'user:online': (user: OnlineUser) => void;
-  'user:offline': (data: { userId: number }) => void;
+  'user:offline': (data: { userId: string }) => void;
   'ping': () => void;
   'pong': (data: { timestamp: number }) => void;
 }
 
 export interface LocationUpdateData {
-  userId: number;
+  userId: string;
   userName: string;
   latitude: number;
   longitude: number;
@@ -109,11 +109,11 @@ export interface LocationUpdateData {
   speed?: number;
   heading?: number;
   timestamp: Date;
-  customerId?: number;
+  customerId?: string;
 }
 
 export interface OnlineUser {
-  id: number;
+  id: string;
   fullName: string;
   username: string;
   role: string;

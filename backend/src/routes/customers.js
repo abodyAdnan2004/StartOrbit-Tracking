@@ -59,9 +59,11 @@ router.get('/', requireRole('admin', 'manager'), async (req, res, next) => {
 // GET /api/customers/:id - Get customer by ID
 router.get('/:id', async (req, res, next) => {
   try {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) {
-      return res.status(400).json({ error: 'Invalid customer ID' });
+    const id = req.params.id;
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      return res.status(400).json({ error: 'Invalid customer ID format' });
     }
 
     const customer = await prisma.customer.findUnique({
@@ -124,9 +126,11 @@ router.post('/', requireRole('admin', 'manager', 'user'), async (req, res, next)
 // PUT /api/customers/:id - Update customer
 router.put('/:id', async (req, res, next) => {
   try {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) {
-      return res.status(400).json({ error: 'Invalid customer ID' });
+    const id = req.params.id;
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      return res.status(400).json({ error: 'Invalid customer ID format' });
     }
 
     const data = updateCustomerSchema.parse(req.body);
@@ -173,9 +177,11 @@ router.put('/:id', async (req, res, next) => {
 // DELETE /api/customers/:id - Delete customer (soft delete)
 router.delete('/:id', requireRole('admin', 'manager'), async (req, res, next) => {
   try {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) {
-      return res.status(400).json({ error: 'Invalid customer ID' });
+    const id = req.params.id;
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      return res.status(400).json({ error: 'Invalid customer ID format' });
     }
 
     const customer = await prisma.customer.findUnique({ where: { id } });
@@ -197,9 +203,11 @@ router.delete('/:id', requireRole('admin', 'manager'), async (req, res, next) =>
 // GET /api/customers/:id/locations - Get location history for a customer
 router.get('/:id/locations', async (req, res, next) => {
   try {
-    const customerId = parseInt(req.params.id);
-    if (isNaN(customerId)) {
-      return res.status(400).json({ error: 'Invalid customer ID' });
+    const customerId = req.params.id;
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(customerId)) {
+      return res.status(400).json({ error: 'Invalid customer ID format' });
     }
 
     const customer = await prisma.customer.findUnique({ where: { id: customerId } });
@@ -212,7 +220,9 @@ router.get('/:id/locations', async (req, res, next) => {
       throw new ForbiddenError('Not authorized to view this customer\'s locations');
     }
 
-    const { page, limit, startDate, endDate } = req.query;
+    const { page = 1, limit = 50, startDate, endDate } = req.query;
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 50;
 
     const where = { customerId };
     if (startDate || endDate) {
@@ -225,22 +235,22 @@ router.get('/:id/locations', async (req, res, next) => {
       prisma.location.findMany({
         where,
         orderBy: { timestamp: 'desc' },
-        skip: (parseInt(page) - 1) * parseInt(limit),
-        take: parseInt(limit) || 50,
+        skip: (pageNum - 1) * limitNum,
+        take: limitNum,
       }),
       prisma.location.count({ where }),
     ]);
 
-    const totalPages = Math.ceil(totalCount / (parseInt(limit) || 50));
+    const totalPages = Math.ceil(totalCount / limitNum);
 
     res.json({
       items: locations,
       pagesCount: totalPages,
-      currentPage: parseInt(page) || 1,
+      currentPage: pageNum,
       type: 'LocationDto',
       totalItems: totalCount,
       calculatedTotalPages: totalPages,
-      currentPageSize: parseInt(limit) || 50,
+      currentPageSize: limitNum,
       totalCount,
       totalPages,
     });

@@ -1,15 +1,15 @@
 // Customer Types
 export interface Customer {
-  id: number;
+  id: string;
   name: string;
   email?: string;
   phone?: string;
   address?: string;
   notes?: string;
   isActive: boolean;
-  userId: number;
+  userId: string;
   user?: {
-    id: number;
+    id: string;
     fullName: string;
     username: string;
   };
@@ -24,7 +24,7 @@ export interface CustomerFilters {
   page?: number;
   limit?: number;
   search?: string;
-  userId?: number;
+  userId?: string;
   isActive?: boolean;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';

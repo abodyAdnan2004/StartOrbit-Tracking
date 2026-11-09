@@ -3,30 +3,26 @@
   "version": "1.0.0",
   "description": "Orbit Tracking - Real-time location tracking system with dashboard, backend API, and mobile app",
   "private": true,
-  "workspaces": [
-    "frontend",
-    "backend"
-  ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:backend": "npm run dev --workspace=backend",
-    "dev:frontend": "npm run dev --workspace=frontend",
-    "dev:mobile": "npm run start --workspace=mobile",
-    "install:all": "npm install && npm install --workspace=frontend && npm install --workspace=backend",
-    "build": "npm run build --workspaces",
-    "build:backend": "npm run build --workspace=backend",
-    "build:frontend": "npm run build --workspace=frontend",
-    "build:mobile": "npm run build --workspace=mobile",
-    "prisma:generate": "npm run prisma:generate --workspace=backend",
-    "prisma:migrate": "npm run prisma:migrate --workspace=backend",
-    "prisma:studio": "npm run prisma:studio --workspace=backend",
-    "prisma:seed": "npm run prisma:seed --workspace=backend",
+    "dev": "pnpm --filter ./backend run dev & pnpm --filter ./frontend run dev",
+    "dev:backend": "pnpm --filter ./backend run dev",
+    "dev:frontend": "pnpm --filter ./frontend run dev",
+    "dev:mobile": "pnpm --filter ./mobile run start",
+    "install:all": "pnpm install",
+    "build": "pnpm --filter ./backend run build && pnpm --filter ./frontend run build && pnpm --filter ./mobile run build:android",
+    "build:backend": "pnpm --filter ./backend run build",
+    "build:frontend": "pnpm --filter ./frontend run build",
+    "build:mobile": "pnpm --filter ./mobile run build:android",
+    "prisma:generate": "pnpm --filter ./backend run prisma:generate",
+    "prisma:migrate": "pnpm --filter ./backend run prisma:migrate",
+    "prisma:studio": "pnpm --filter ./backend run prisma:studio",
+    "prisma:seed": "pnpm --filter ./backend run prisma:seed",
     "docker:up": "docker-compose -f backend/docker-compose.yml up -d",
     "docker:down": "docker-compose -f backend/docker-compose.yml down",
     "docker:logs": "docker-compose -f backend/docker-compose.yml logs -f",
     "docker:dev": "docker-compose -f backend/docker-compose.dev.yml up -d",
-    "lint": "npm run lint --workspaces",
-    "format": "npm run format --workspaces"
+    "lint": "pnpm --filter ./frontend run lint && pnpm --filter ./backend run lint",
+    "format": "pnpm --filter ./frontend run format && pnpm --filter ./backend run format"
   },
   "keywords": [
     "tracking",
@@ -39,10 +35,11 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@types/leaflet": "^1.9.22",
     "concurrently": "^8.2.2"
   },
   "engines": {
     "node": ">=20.0.0"
   },
-  "packageManager": "npm@10.8.0"
+  "packageManager": "pnpm@9.4.0"
 }

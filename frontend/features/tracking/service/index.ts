@@ -5,16 +5,16 @@ import type { LocationDto, LocationFilters, UserLocation, TrackingCustomer } fro
 interface ILocationService {
   get: (filters: LocationFilters) => Promise<PaginatedResponse<LocationDto>>
   getLatest: () => Promise<{ items: UserLocation[] }>
-  getByUser: (userId: number, filters: LocationFilters) => Promise<PaginatedResponse<LocationDto>>
-  getDistanceStats: (userId: number, startDate?: string, endDate?: string) => Promise<{
-    userId: number
+  getByUser: (userId: string, filters: LocationFilters) => Promise<PaginatedResponse<LocationDto>>
+  getDistanceStats: (userId: string, startDate?: string, endDate?: string) => Promise<{
+    userId: string
     totalDistanceMeters: number
     totalDistanceKm: string
     estimatedSteps: number
     locationCount: number
     period: { start: string | null; end: string | null }
   }>
-  getCustomers: (userId: number) => Promise<TrackingCustomer[]>
+  getCustomers: (userId: string) => Promise<TrackingCustomer[]>
 }
 
 export class LocationService implements ILocationService {
@@ -30,15 +30,15 @@ export class LocationService implements ILocationService {
     return response.data
   }
 
-  async getByUser(userId: number, filters: LocationFilters): Promise<PaginatedResponse<LocationDto>> {
+  async getByUser(userId: string, filters: LocationFilters): Promise<PaginatedResponse<LocationDto>> {
     const response = await axios.get<PaginatedResponse<LocationDto>>(`/locations/user/${userId}`, {
       params: filters,
     })
     return response.data
   }
 
-  async getDistanceStats(userId: number, startDate?: string, endDate?: string): Promise<{
-    userId: number
+  async getDistanceStats(userId: string, startDate?: string, endDate?: string): Promise<{
+    userId: string
     totalDistanceMeters: number
     totalDistanceKm: string
     estimatedSteps: number
@@ -53,7 +53,7 @@ export class LocationService implements ILocationService {
     return response.data
   }
 
-  async getCustomers(userId: number): Promise<TrackingCustomer[]> {
+  async getCustomers(userId: string): Promise<TrackingCustomer[]> {
     const response = await axios.get<TrackingCustomer[]>(`/users/${userId}/customers`)
     return response.data
   }

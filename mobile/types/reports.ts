@@ -13,7 +13,7 @@ export interface DashboardSummary {
 }
 
 export interface LeaderboardUser {
-  userId: number;
+  userId: string;
   fullName: string;
   username: string;
   role: string;
@@ -41,7 +41,7 @@ export interface TopActiveUsers extends LeaderboardUser {
 }
 
 export interface ActivationTrackingItem {
-  userId: number;
+  userId: string;
   fullName: string;
   username: string;
   email: string;
@@ -57,7 +57,7 @@ export interface ActivationTrackingItem {
 
 export interface UserActivityDetail {
   user: {
-    id: number;
+    id: string;
     fullName: string;
     username: string;
     email: string;
@@ -74,7 +74,7 @@ export interface UserActivityDetail {
   };
   dailyActivity: DailyActivity[];
   recentLocations: Location[];
-  customersCreated: { id: number; name: string; createdAt: string }[];
+  customersCreated: { id: string; name: string; createdAt: string }[];
 }
 
 export interface DailyActivity {
@@ -94,9 +94,9 @@ export interface HeatmapData {
 }
 
 export interface Location {
-  id: number;
-  userId: number;
-  customerId?: number;
+  id: string;
+  userId: string;
+  customerId?: string;
   latitude: number;
   longitude: number;
   altitude?: number;

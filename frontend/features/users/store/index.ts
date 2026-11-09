@@ -12,14 +12,14 @@ export const useUserStore = defineStore('users', () => {
     pageNumber: 1,
     pageSize: 20,
     search: null,
-    roleId: null,
+    role: null,
     isActive: null,
   })
 
   const isCreateDialogOpen = ref(false)
   const isEditDialogOpen = ref(false)
   const isChangePasswordDialogOpen = ref(false)
-  const selectedItemId = ref<number | null>(null)
+  const selectedItemId = ref<string | null>(null)
   const selectedItem = ref<UserDto | null>(null)
 
   const getAll = async () => {
@@ -64,7 +64,7 @@ export const useUserStore = defineStore('users', () => {
     }
   }
 
-  const remove = async (id: number) => {
+  const remove = async (id: string) => {
     try {
       isLoading.value = true
       await userService.delete(id)

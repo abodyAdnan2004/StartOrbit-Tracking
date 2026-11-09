@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue'
 import { FileService } from '~/common/services/app-client/fileService'
 
 const props = defineProps<{
@@ -7,7 +6,7 @@ const props = defineProps<{
   imageKey: string
 }>()
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'remove'])
 
 const signedUrl = ref<string>('')
 const fileService = new FileService()

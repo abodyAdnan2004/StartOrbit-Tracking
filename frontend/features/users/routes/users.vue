@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppCrudActions from '~/common/components/app-crud/components/AppCrudActions.vue'
 import AppTable from '~/common/components/app-table/AppTable.vue'
+import AppInputField from '~/common/components/app-field/AppInputField.vue'
 import { useAppTableStore } from '~/common/components/app-table/stores/AppTableStore'
 import { tableHeader } from '~/features/users'
 import UserCreate from '~/features/users/components/UserCreate.vue'
@@ -34,7 +35,7 @@ fetchAll()
 watch(filters, () => fetchAll(), { deep: true })
 
 onUnmounted(() => {
-  store.filters = { pageNumber: 1, pageSize: 20, search: null, roleId: null, isActive: null }
+  store.filters = { pageNumber: 1, pageSize: 20, search: null, role: null, isActive: null }
 })
 </script>
 
@@ -49,15 +50,10 @@ onUnmounted(() => {
       @update:current-page="filters.pageNumber = $event"
     >
       <template #filters>
-        <BaseInput v-model="filters.search" placeholder="Search users..." />
+        <AppInputField v-model="filters.search" placeholder="Search users..." />
       </template>
 
-      <AppTable
-        title="Users"
-        :headers="tableHeader()"
-        :items="items"
-        :is-loading="isLoading"
-      >
+      <AppTable title="Users" :headers="tableHeader()" :items="items" :is-loading="isLoading">
         <template #data-employeeId="{ item }">
           <span class="font-mono text-sm">{{ item.employeeId }}</span>
         </template>
@@ -79,10 +75,7 @@ onUnmounted(() => {
         </template>
 
         <template #data-role="{ item }">
-          <BaseBadge
-            :color="item.role.isSystemRole ? 'purple' : 'blue'"
-            :dot="true"
-          >
+          <BaseBadge :color="item.role.isSystemRole ? 'purple' : 'blue'" :dot="true">
             {{ item.role.name }}
           </BaseBadge>
         </template>
@@ -102,7 +95,7 @@ onUnmounted(() => {
                 store.isEditDialogOpen = true
               }
             "
-            :delete-service="store.remove"
+            :delete-service="(id: string) => store.remove(id)"
           />
         </template>
       </AppTable>

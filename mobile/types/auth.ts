@@ -1,6 +1,6 @@
 // Auth Types
 export interface User {
-  id: number;
+  id: string;
   employeeId: number;
   username: string;
   email: string;
@@ -9,7 +9,6 @@ export interface User {
   fullName: string;
   phoneNumber: string;
   role: string;
-  roleId: number;
   isActive: boolean;
 }
 
@@ -17,7 +16,7 @@ export interface Role {
   name: string;
   description: string;
   isSystemRole: boolean;
-  id: number;
+  id: string;
   isActive: boolean;
 }
 
@@ -51,7 +50,6 @@ export interface RegisterRequest {
   firstName: string;
   lastName: string;
   phoneNumber?: string;
-  roleId?: number;
 }
 
 export interface ChangePasswordRequest {

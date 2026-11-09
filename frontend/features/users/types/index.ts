@@ -3,7 +3,7 @@ import type { BaseDto } from '~/common/utils/types/base-dto'
 
 // User roles
 export interface Role {
-  id: number
+  id: string
   name: string
   description: string | null
   isSystemRole: boolean
@@ -12,7 +12,6 @@ export interface Role {
 
 // User DTO (what the API returns)
 export interface UserDto extends BaseDto {
-  id: number
   employeeId: number
   username: string
   email: string
@@ -21,10 +20,7 @@ export interface UserDto extends BaseDto {
   fullName: string
   phoneNumber: string | null
   role: Role
-  roleId: number
   isActive: boolean
-  createdAt: string
-  updatedAt: string
 }
 
 // Create payload
@@ -36,18 +32,19 @@ export interface UserCreateDto {
   firstName: string
   lastName: string
   phoneNumber?: string | null
-  roleId: number
+  role: string | null
   isActive?: boolean
 }
 
 // Update payload
 export interface UserUpdateDto {
+  id: string | null
   username?: string
   email?: string
   firstName?: string
   lastName?: string
   phoneNumber?: string | null
-  roleId?: number
+  role: string | null
   isActive?: boolean
 }
 
@@ -60,7 +57,7 @@ export interface ChangePasswordDto {
 
 // Filters for listing users
 export interface UserFilters extends BaseFilters {
-  search?: string | null
-  roleId?: number | null
+  search: string | null
+  role?: string | null
   isActive?: boolean | null
 }

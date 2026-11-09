@@ -23,6 +23,7 @@
     "expo-device": "^6.0.2",
     "expo-location": "^17.0.1",
     "expo-notifications": "^0.28.16",
+    "expo-router": "^58.0.30",
     "expo-status-bar": "^1.12.1",
     "expo-task-manager": "^11.8.2",
     "react": "18.2.0",
@@ -95,7 +96,9 @@
         {
           "icon": "./assets/notification-icon.png",
           "color": "#3B82F6",
-          "sounds": ["./assets/notification.wav"]
+          "sounds": [
+            "./assets/notification.wav"
+          ]
         }
       ]
     ],

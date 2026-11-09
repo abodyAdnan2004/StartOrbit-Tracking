@@ -116,7 +116,7 @@ project-root/
 │       ├── index.ts
 │       └── types/
 │           ├── ApiResponses.ts  # PaginatedResponse<T>, BaseFilters, ApiError…
-│           ├── base-dto.ts      # BaseDto (id, deleted, creationDate…)
+│           ├── base-dto.ts      # BaseDto (id, deleted, createdAt…)
 │           ├── files.ts
 │           └── filters.ts
 │
