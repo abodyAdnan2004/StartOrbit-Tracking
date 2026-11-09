@@ -307,61 +307,6 @@ async function main() {
   ]);
   console.log('✅ Customers created');
 
-  // Create sample location data for testing reports
-  console.log('Creating sample location data...');
-  const now = new Date();
-  const locations = [];
-
-  // Generate locations for each field user over the past 7 days
-  for (const user of fieldUsers) {
-    const userCustomers = customers.filter(c => c.userId === user.id);
-    const baseLat = 40.7128 + (Math.random() - 0.5) * 0.1; // NYC area
-    const baseLng = -74.0060 + (Math.random() - 0.5) * 0.1;
-
-    for (let day = 6; day >= 0; day--) {
-      const dayDate = new Date(now);
-      dayDate.setDate(dayDate.getDate() - day);
-      dayDate.setHours(8, 0, 0, 0); // Start at 8 AM
-
-      // Generate 20-50 locations per day per user
-      const locationsPerDay = Math.floor(Math.random() * 30) + 20;
-
-      for (let i = 0; i < locationsPerDay; i++) {
-        const timestamp = new Date(dayDate);
-        timestamp.setMinutes(timestamp.getMinutes() + i * 15 + Math.floor(Math.random() * 15));
-
-        // Simulate movement around base location
-        const lat = baseLat + (Math.random() - 0.5) * 0.02;
-        const lng = baseLng + (Math.random() - 0.5) * 0.02;
-
-        // Assign to a random customer 30% of the time
-        const customerId = Math.random() < 0.3 && userCustomers.length > 0
-          ? userCustomers[Math.floor(Math.random() * userCustomers.length)].id
-          : null;
-
-        locations.push({
-          userId: user.id,
-          customerId,
-          latitude: lat,
-          longitude: lng,
-          altitude: Math.floor(Math.random() * 100),
-          accuracy: Math.random() * 20 + 5,
-          speed: Math.random() * 5,
-          heading: Math.random() * 360,
-          timestamp,
-          metadata: { source: 'mobile', battery: Math.floor(Math.random() * 100) },
-        });
-      }
-    }
-  }
-
-  // Batch insert locations
-  await prisma.location.createMany({
-    data: locations,
-    skipDuplicates: true,
-  });
-  console.log(`✅ Created ${locations.length} sample location records`);
-
   console.log('\n🎉 Seed completed successfully!');
   console.log('\n📋 Test Credentials:');
   console.log('Admin:    admin / password123');

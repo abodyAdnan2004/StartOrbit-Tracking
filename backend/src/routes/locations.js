@@ -138,17 +138,42 @@ router.get('/', async (req, res, next) => {
 // GET /api/locations/latest - Get latest location for each user (for real-time map)
 router.get('/latest', requireRole('admin', 'manager'), async (req, res, next) => {
   try {
-    // Get latest location per user using a subquery
-    const latestLocations = await prisma.$queryRaw`
-      SELECT DISTINCT ON (l."userId")
-        l.id, l."userId", l."customerId", l.latitude, l.longitude,
-        l.altitude, l.accuracy, l.speed, l.heading, l.timestamp, l.metadata,
-        u."fullName", u.username
-      FROM "locations" l
-      JOIN "users" u ON u.id = l."userId"
-      WHERE u."isActive" = true
-      ORDER BY l."userId", l.timestamp DESC
-    `;
+    // Get latest location per user using Prisma (works with both SQLite and PostgreSQL)
+    // First get all active users with their latest location
+    const users = await prisma.user.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        fullName: true,
+        username: true,
+        locations: {
+          where: {},
+          orderBy: { timestamp: 'desc' },
+          take: 1,
+          select: {
+            id: true,
+            userId: true,
+            customerId: true,
+            latitude: true,
+            longitude: true,
+            altitude: true,
+            accuracy: true,
+            speed: true,
+            heading: true,
+            timestamp: true,
+            metadata: true,
+          },
+        },
+      },
+    });
+
+    const latestLocations = users
+      .filter(u => u.locations.length > 0)
+      .map(u => ({
+        ...u.locations[0],
+        fullName: u.fullName,
+        username: u.username,
+      }));
 
     res.json({
       items: latestLocations,

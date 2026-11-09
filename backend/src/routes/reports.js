@@ -379,6 +379,7 @@ async function getTopCustomersAdded(dateFilter, limit = 10) {
   const users = await prisma.user.findMany({
     where: { isActive: true },
     include: {
+      role: true,
       _count: {
         select: {
           customers: {
