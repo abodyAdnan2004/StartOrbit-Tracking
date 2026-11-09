@@ -1,0 +1,102 @@
+// Prisma Schema for Orbit Tracking Backend
+// Database: SQLite for development, PostgreSQL for production
+// Provider is set via DATABASE_PROVIDER env var (sqlite or postgresql)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = env("DATABASE_PROVIDER") || "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User model - matches frontend AuthResponse User structure
+model User {
+  id            Int       @id @default(autoincrement())
+  employeeId    Int       @unique
+  username      String    @unique
+  email         String    @unique
+  passwordHash  String
+  firstName     String
+  lastName      String
+  fullName      String
+  phoneNumber   String?
+  isActive      Boolean   @default(true)
+  roleId        Int
+  role          Role      @relation(fields: [roleId], references: [id])
+  customers     Customer[]
+  locations     Location[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("users")
+}
+
+// Role model - matches frontend Role structure
+model Role {
+  id            Int       @id @default(autoincrement())
+  name          String    @unique
+  description   String?
+  isSystemRole  Boolean   @default(false)
+  isActive      Boolean   @default(true)
+  users         User[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("roles")
+}
+
+// Customer model - assigned to users
+model Customer {
+  id          Int       @id @default(autoincrement())
+  name        String
+  email       String?
+  phone       String?
+  address     String?
+  notes       String?
+  isActive    Boolean   @default(true)
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  locations   Location[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("customers")
+}
+
+// Location model - real-time tracking data from mobile app
+model Location {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  customerId  Int?
+  customer    Customer? @relation(fields: [customerId], references: [id])
+  latitude    Float
+  longitude   Float
+  altitude    Float?
+  accuracy    Float?
+  speed       Float?
+  heading     Float?
+  timestamp   DateTime  @default(now())
+  metadata    Json?
+
+  @@map("locations")
+  @@index([userId, timestamp])
+  @@index([customerId, timestamp])
+}
+
+// RefreshToken model for JWT refresh token rotation
+model RefreshToken {
+  id        Int       @id @default(autoincrement())
+  token     String    @unique
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  @@map("refresh_tokens")
+  @@index([userId])
+  @@index([token])
+}

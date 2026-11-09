@@ -1,0 +1,48 @@
+{
+  "name": "orbit-tracking",
+  "version": "1.0.0",
+  "description": "Orbit Tracking - Real-time location tracking system with dashboard, backend API, and mobile app",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev:mobile": "npm run start --workspace=mobile",
+    "install:all": "npm install && npm install --workspace=frontend && npm install --workspace=backend",
+    "build": "npm run build --workspaces",
+    "build:backend": "npm run build --workspace=backend",
+    "build:frontend": "npm run build --workspace=frontend",
+    "build:mobile": "npm run build --workspace=mobile",
+    "prisma:generate": "npm run prisma:generate --workspace=backend",
+    "prisma:migrate": "npm run prisma:migrate --workspace=backend",
+    "prisma:studio": "npm run prisma:studio --workspace=backend",
+    "prisma:seed": "npm run prisma:seed --workspace=backend",
+    "docker:up": "docker-compose -f backend/docker-compose.yml up -d",
+    "docker:down": "docker-compose -f backend/docker-compose.yml down",
+    "docker:logs": "docker-compose -f backend/docker-compose.yml logs -f",
+    "docker:dev": "docker-compose -f backend/docker-compose.dev.yml up -d",
+    "lint": "npm run lint --workspaces",
+    "format": "npm run format --workspaces"
+  },
+  "keywords": [
+    "tracking",
+    "realtime",
+    "location",
+    "dashboard",
+    "mobile",
+    "websocket"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "npm@10.8.0"
+}

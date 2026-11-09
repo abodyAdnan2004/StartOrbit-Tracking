@@ -1,0 +1,104 @@
+.vdr-none {
+  position: absolute;
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.nui-input-wrapper.nui-input-default .nui-input,
+.dp__input,
+.nui-autocomplete-input,
+.flatpickr-input {
+  background: #f9fafb !important;
+  color: #424b60 !important;
+  border-radius: 48px !important;
+
+  &::placeholder {
+    color: #96a0b6 !important;
+    font-size: 16px !important;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+/* Style the scrollbar track */
+::-webkit-scrollbar-track {
+  background-color: transparent;
+  /* Light gray background */
+  border-radius: 10px;
+}
+
+/* Style the scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  // background-color: #f1f1f1; /* Gray thumb */
+  border-radius: 10px;
+  border: 3px solid #767676;
+  /* Space around the thumb */
+}
+
+/* Style the scrollbar thumb on hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+/* Style the scrollbar corner */
+::-webkit-scrollbar-corner {
+  background-color: #f1f1f1;
+}
+
+.nui-breadcrumb-item {
+  a {
+    text-align: center;
+    color: #444750 !important;
+    font-size: 16px !important;
+
+    &.router-link-active {
+      color: #a9321e !important;
+      font-weight: 700;
+    }
+  }
+}
+
+.nui-dropdown {
+  .nui-button.nui-button-solid.nui-button-default {
+    background: rgba(#a2a2a2, 10%);
+    border: 0;
+    width: 62px !important;
+    font-size: 12px;
+  }
+}
+
+.bg-primary-gradient {
+  background: linear-gradient(180deg, #a01e11 0%, #750d02 100%) !important;
+  transition: all 0.7s ease;
+
+  &:hover {
+    background: linear-gradient(0deg, #a01e11 0%, #750d02 100%) !important;
+  }
+}
+
+.chip {
+  width: fit-content;
+  height: fit-content;
+  font-weight: 700;
+  text-transform: capitalize;
+  @apply rounded-3xl px-5 py-1;
+
+  &.current-chip {
+    color: #0bcb14;
+    background: #fff;
+    box-shadow: 0px 2px 1px 0px rgba(87, 87, 87, 0.19);
+  }
+
+  &.previous-chip {
+    background: rgba(162, 162, 162, 0.1);
+    color: #6c757d;
+  }
+}

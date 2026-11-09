@@ -1,0 +1,81 @@
+.nui-input-wrapper .nui-input-label,
+.nui-input-wrapper .nui-label-float {
+  color: #000;
+  margin-bottom: 0.3rem;
+}
+
+.apexcharts-toolbar {
+  display: none !important;
+}
+
+.nui-textarea-label,
+.nui-input-label,
+.dp__label {
+  color: #000 !important;
+  font-weight: 400;
+  font-size: 14px !important;
+}
+
+.nui-input-wrapper:not(.nui-has-icon).nui-input-md .nui-input {
+  padding: 0.5rem;
+  border: 0px;
+}
+
+.nui-textarea-wrapper.nui-textarea-default .nui-textarea:where([class~='dark'], [class~='dark'] *) {
+  background-color: #ffffff0f !important;
+  border: 0px;
+}
+
+.nui-input-wrapper.nui-input-default .nui-input:where([class~='dark'], [class~='dark'] *) {
+  --tw-text-opacity: 1;
+  color: black;
+}
+
+.dp__input_icon {
+  display: flex;
+}
+
+input {
+  height: auto !important;
+  width: 100% !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.nui-input-icon,
+.dp__input_icon,
+.nui-autocomplete-icon {
+  color: #16ca8b !important;
+}
+
+.leaflet-control-attribution {
+  display: none !important;
+}
+
+input[type='color'] {
+  -webkit-appearance: none;
+  border: none;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type='color']::-webkit-color-swatch {
+  border: none;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}

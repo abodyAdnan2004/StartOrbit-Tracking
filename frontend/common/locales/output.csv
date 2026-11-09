@@ -1,0 +1,731 @@
+Key,Value
+number-of-halls,عدد القاعات
+number-of-exams,عدد الامتحانات
+number-of-students,عدد المسجلين
+amount,المبلغ
+admin-reports,تقارير النظام
+user-activity,نشاط المستخدم
+user-activity-report-description,يعرض هذا التقرير نشاط المستخدم في النظام
+user,المستخدم
+action,الإجراء
+system-performance,أداء النظام
+system-performance-report,تقرير أداء النظام
+system-performance-report-description,يظهر هذا التقرير أداء النظام
+exam-attendance,حضور الامتحان
+exam-attendance-report-description,يظهر هذا التقرير حضور الامتحان
+exam-attendance-report,تقرير حضور الامتحان
+exam-manager-reports,تقارير مدير الامتحان
+exam-schedule-conflict,تعارض جدول الامتحانات
+exam-schedule-conflict-report,تقرير تعارض جدول الامتحانات
+exam-schedule-conflict-report-description,يظهر هذا التقرير تعارض جدول الامتحانات
+student-registration,تسجيل المسجلين
+student-registration-report,تقرير تسجيل المسجلين
+student-registration-report-description,يظهر هذا التقرير تسجيل المسجلين
+question-bank-admin-reports,تقارير إدارة بنك الأسئلة
+question-approval-rejection,موافقة/رفض الأسئلة
+question-approval-rejection-report,تقرير موافقة/رفض الأسئلة
+question-approval-rejection-report-description,يظهر هذا التقرير موافقة/رفض الأسئلة
+question-usage-performance,أداء استخدام الأسئلة
+question-usage-performance-report,تقرير أداء استخدام الأسئلة
+question-usage-performance-report-description,يظهر هذا التقرير أداء استخدام الأسئلة
+evaluator-reports,تقارير المقيم
+evaluator-report-description,يظهر هذا التقرير المقيم
+pending-grading,التصحيح المعلق
+pending-grading-report,تقرير التصحيح المعلق
+pending-grading-report-description,يظهر هذا التقرير التصحيح المعلق
+student-reports,تقارير المسجلين
+exam-performance,أداء الامتحان
+exam_performance_report,تقرير أداء الامتحان
+exam-performance-report-description,يظهر هذا التقرير أداء الامتحان
+most-difficult-subjects,أصعب المواد
+most_difficult_subjects_report,تقرير أصعب المواد
+most-difficult-subjects-report-description,يظهر هذا التقرير أصعب المواد
+home-page,الصفحة الرئيسية
+exam-center-home,الصفحة الرئيسية لمركز الامتحان
+exam-center-id,رقم مركز الامتحان
+active-exams,الامتحانات النشطة
+students-present,المسجلين الحاضرون
+total-capacity,السعة الإجمالية
+recent-activity,النشاط الأخير
+scheduled-exams-content,عرض وإدارة الامتحانات المجدولة لهذا المركز
+reports-content,الوصول إلى تقارير وتحليلات مركز الامتحان
+questions-bank,بنك الأسئلة
+questions,الأسئلة
+blueprints,نماذج الاسئلة
+exams,الامتحانات
+scheduled-exams,الامتحانات المجدولة
+topics,الموضوعات
+subjects,المواد الدراسية
+delete-confirmation,هل أنت متأكد أنك تريد حذف هذا العنصر؟
+delete,حذف
+cancel,إلغاء
+add,إضافة
+logout,تسجيل الخروج
+ems,نظام إدارة الامتحانات
+moheser,وزارة التعليم العالي والبحث العلمي
+question-bank-schedule,ادارة بنوك الأسئلة
+to-create-groups-of-questions,لإنشاء مجموعات من الأسئلة
+create-question-bank,إنشاء بنك أسئلة
+search,بحث
+filter,تصفية
+add-questions,إضافة سؤال
+subject,المادة
+actions,الإجراءات
+type,النوع
+title,العنوان
+difficulty,الصعوبة
+knowledge,المحاور
+creator,معد اسئلة
+creation-date,تاريخ الإنشاء
+auditor,المدقق
+audit-date,تاريخ التدقيق
+used-times,عدد مرات الاستخدام
+audit-status,حالة التدقيق
+easy,سهل
+medium,متوسط
+hard,صعب
+remember,تذكر
+understand,فهم
+apply,تطبيق
+analyze,تحليل
+evaluate,تقييم
+create,إنشاء
+multiple-choice,اختيار من متعدد
+fill-the-blank,املأ الفراغ
+dropdown,قائمة منسدلة
+article,مقالة
+true-or-false,صح أو خطأ
+radio,اختيار واحد
+matching,مطابقة
+reorder,إعادة ترتيب
+questions-page,صفحة الأسئلة
+subject-0,المادة
+topics-0,الموضوعات
+actions-0,الإجراءات
+select-subject,اختر المادة
+select-topics,اختر الموضوعات
+save-change,حفظ التغييرات
+questions-editor,محرر الأسئلة
+to-add-or-edit-questions,لإضافة أو تعديل الأسئلة
+exam-question-form,نموذج اسئلة الامتحان
+it-is-a-special-form-to-enter-the-exam-questions-to-be-summoned-in-the-exam-department,هو نموذج خاص لإدخال أسئلة الامتحان ليتم استدعاؤها في قسم الامتحانات
+save-changes,حفظ التغييرات
+select-a-question-type,اختر نوع السؤال
+select-a-difficulty,اختر مستوى الصعوبة
+select-a-knowledge,اختر مستوى المحاور
+question-title,السؤال
+answer,الإجابة
+true,صحيح
+false,خطأ
+select-the-correct-answer,اختر الإجابة الصحيحة
+add-more-answers,إضافة المزيد من الإجابات
+question-answers,إجابات السؤال:
+question,السؤال
+create-and-manage-blueprints,إنشاء وإدارة نماذج
+create-blueprint,إنشاء نموذج اسئلة
+schedule,جدولة
+create-blueprints,إنشاء نماذج الاسئلة
+wirting-title,ادخل العنوان
+wirting-grade,درجة الكتابة
+success-grade,الدرجة القصوى
+add-subject,إضافة مادة
+display-result,عرض النتيجة
+move-between-questions,التنقل بين الأسئلة
+randomize-answers,عشوائية الاسئلة
+randomize-choices,عشوائية الخيارات
+name,الاسم
+grade,الدرجة
+number-of-questions,عدد الأسئلة
+question-type,نوع السؤال
+degree-type,نوع الدرجة
+randomize-questions,عشوائية الأسئلة
+exams-page,صفحة الامتحانات
+create-and-manage-exams,إنشاء وإدارة الامتحانات
+create-exams,إنشاء امتحان
+show,عرض
+enter-title,أدخل العنوان
+start-date,تاريخ البدء
+enter-start-date,أدخل تاريخ البدء
+start-time,وقت البدء
+enter-start-time,أدخل وقت البدء
+end-date,تاريخ الانتهاء
+enter-end-date,أدخل تاريخ الانتهاء
+end-time,وقت الانتهاء
+enter-end-time,أدخل وقت الانتهاء
+quarterly,فصلي
+semi-annual,نصف سنوي
+final,امتحان تقويمي
+postgraduate,دراسات عليا
+evaulation-proficiency,الاختبار الوطني الموحد  ( امتحان الكفاءة )
+mock,تجريبي
+select-exam-type,اختر نوع الامتحان
+exam-type,نوع الامتحان
+english,اللغة الانجليزية
+arabic,اللغة العربية
+computer,الحاسوب
+price,السعر
+retry-price,سعر الإعادة
+proficiency-exam-group,مجموعة امتحان الكفاءة
+proficiency-exam-group-required,مجموعة امتحان الكفاءة مطلوبة
+duration-in-minutes,المدة (بالدقائق)
+enter-duration,أدخل المدة
+enterance-time-allowed-in-minutes,الوقت المسموح به للدخول (بالدقائق)
+enter-enterance-time-allowed,أدخل الوقت المسموح به للدخول
+blueprint,نموذج الاسئلة
+start-end,البداية - النهاية
+duration,المدة
+attendance,الحضور
+pass,نجاح
+fail,رسوب
+this-is-the-home-page,هذه هي الصفحة الرئيسية
+this-is-the-scheduled-exams-page,هذه هي صفحة الامتحانات المجدولة
+create-and-manage-subjects,إنشاء وإدارة المواد الدراسية
+add-new-subject,إضافة مادة جديدة
+create-new-subject,إنشاء مادة جديدة
+subject-name,اسم المادة
+topic-name,اسم الموضوع
+create-topic,إنشاء موضوع
+create-new-topic,إنشاء موضوع جديد
+create-and-manage-topics,إنشاء وإدارة الموضوعات
+add-new-topic,انشاء موضوع جديد
+enter-the-text,أدخل النص
+assigns,تعيين 
+edit-questions,تحرير الاسئلة
+edit,تعديل
+add-more,اضافة المزيد
+select-creator,تحديد منشئ الاسئلة
+select-auditors,تحديد المدققين
+Percentage,نسبة مئوية
+Points,درجات
+Letters,حروف
+Yes,نعم
+No,لا
+select-the-options-of-the-exam,حدد خيارات الامتحان
+more-settings,المزيد من الإعدادات
+sort,نوع
+eveluator,المصحح
+view,التفاصيل
+no-data-found,لا توجد بيانات متاحة
+no-data-found-subtitle,ليس هناك بيانات ليتم عرضها
+exam-view,رؤية الامتحان
+to-view-exam-like-student,لعرض الامتحان مثل الطالب
+exam-center,مركز الامتحان
+exam-centers,مراكز الامتحان
+deactivate-exam-center,إلغاء تفعيل مركز الامتحان
+deactivation-date,تاريخ إلغاء التفعيل
+deactivation-reason,سبب إلغاء التفعيل
+deactivation-reason-placeholder,يرجى تقديم سبب مفصل لإلغاء تفعيل مركز الامتحان هذا...
+deactivation-warning-title,ايقاف المركز الامتحاني واعطاء محاولة مجانية
+deactivation-warning-message,إلغاء تفعيل {centerName} سيؤدي إلى إلغاء جميع حجوزات الطلاب النشطة للتاريخ المحدد ومنح إعادة امتحان مجانية تلقائياً.
+confirm-deactivation,تأكيد إلغاء التفعيل
+affected-tickets,التذاكر المتأثرة
+students-affected,الطلاب المتأثرون
+free-take-points-granted,نقاط الإعادة المجانية الممنوحة
+what-happens-when-deactivated,ماذا يحدث عند إلغاء تفعيل مركز الامتحان؟
+deactivation-effect-1,سيتم إلغاء جميع تذاكر الطلاب لتاريخ إلغاء التفعيل تلقائياً
+deactivation-effect-2,سيحصل الطلاب المتأثرون على نقاط إعادة امتحان مجانية لإعادة جدولة امتحاناتهم
+deactivation-effect-3,لن يكون مركز الامتحان متاحاً للحجوزات الجديدة في تاريخ إلغاء التفعيل
+prev,السابق
+next,التالي
+create-examination-center,انشاء مركز امتحاني جديد
+governorate,المحافظة
+hall,القاعات
+capacity,السعة
+examination-centers,المراكز الامتحانية
+is-active,فعال
+security-system,نظام الامن
+create-and-manage-examination-centers,إنشاء وإدارة مراكز الامتحان
+active,فعال
+inactive,غير فعال
+Pending,قيد الانتظار
+Rejected,مرفوض
+Approved,موافقة
+Approve,موافقة
+Reject,رفض
+rejection-reason,سبب الرفض
+rejection-heading,هل أنت متأكد من رفض هذا الموضوع؟
+rejection-description,إذا كانت نعم ، يرجى إدراج سبب الرفض
+reject,رفض
+grades,الدرجات
+todays-exams,امتحانات اليوم
+expired-exams,امتحانات منتهية الصلاحية
+completed-exams,الامتحانات المكتملة
+COMPLETED,مكتمل
+join-now,انضم الآن
+register,يسجل
+expired,منتهي الصلاحية
+pending,قيد التقدم
+completed,مكتمل
+you-are-going-to-start-the,سوف تبدأ امتحان الـ 
+are-you-sure,، هل أنت متأكد؟
+enter-the-code-to-attend-the-exam-with-these-details,أدخل الرمز لحضور الامتحان بهذه التفاصيل
+start-the-exam,ابدأ الامتحان
+enter-the-code,أدخل الرمز
+welcome-to-the,اهلا بك في امتحان الـ 
+you-have-60-minutes-to-complete-the-exam-good-luck,لديك 60 دقيقة لإكمال الامتحان. 
+حظ سعيد!
+start-the-exam-to-show-the-questions,ابدأ الامتحان لإظهار الأسئلة
+finish-the-exam,إنهاء الامتحان
+exam-submitted-succesfully,تم تقديم الامتحان بشكل ناجح
+thank-you-for-completing-the,شكراً لأكمالك امتحان الـ 
+back,خلف
+next-question,السؤال التالي
+of,ل
+the-exam-number,رقم الامتحان
+hoda-mohamed-ahmed,هدى محمد أحمد
+exam,الامتحان
+department,القسم
+result,النتيجة
+evaluations,تصحيح الامتحانات
+to-evaluate-questions,لتصحيح الاسئلة وامتحانات الطلبة
+student-name,اسم الطالب
+university,الجامعة
+date,التاريخ
+status,الحالة
+no-of-questions,عدد الأسئلة
+not-started,لم يبدأ
+in-progress,جاري الامتحان
+out-of,من 
+study-year,السنة الدراسية
+time,الوقت
+employees,الموظفين
+higher_education_and_scientific_research_ministry,وزارة التعليم العالي والبحث العلمي
+ministry_info,كل ما يتعلق بالوزارة
+baghdad_university,جامعة بغداد
+choose_college,اختر الكلية
+college_of_engineering,كلية الهندسة
+college_info,كل ما يتعلق بالكلية
+department_of_electrical_engineering,قسم الهندسة الكهربائية
+department_info,كل ما يتعلق بالقسم
+department_of_civil_engineering,قسم الهندسة المدنية
+mustansiriyah_university,الجامعة المستنصرية
+college_of_medicine,كلية الطب
+department_of_human_medicine,قسم الطب البشري
+card-view,طريقة العرض: مفصلة
+table-view,طريقة العرض: جدول
+question-count,عدد الاسئلة
+open,فتح وتعديل الاسئلة
+view-auditor,المدققين
+auditors-group,مجموعة المدققين
+view-creator,رؤية معدي الاسئلة
+question-bank,بنك الاسئلة
+select-organization,حدد الهيكيلة
+question-banks,بنك الاسئلة
+security-name,اسم المستخدم
+password,كلمة المرور
+url,عنوان URL
+college-name,الكلية
+departments,الاقسام
+students,المسجلين
+student-page,صفحة المسجلين
+manage-students,إدارة المسجلين في الامتحان
+student-in-the-exam,المسجلين المضافين في الامتحان
+display-the-students-who-are-taking-the-exam,عرض المسجلين الذين يأخذون الامتحان
+university-id-number,الرقم الجامعي
+email,البريد الالكتروني
+gender,الجنس
+stage,المرحلة
+phone-number,رقم الهاتف
+male,ذكر
+female,انثى
+not-taken,لم يمتحن
+Failed,راسب
+passed,ناجح
+organizations,الاقسام
+select-organizational-structure,حدد الاقسام لإضافتها
+groups,المجموعات
+student-reports-description,يظهر هذا التقرير المسجلين
+evaluation-speed-trends,أداء التقييم
+letter,الحرف
+id,المعرف
+full-name,اسم المجال
+exam-name,اسم الامتحان
+national-id,رقم الهوية
+internal,داخلي
+external,خارجي
+average-score,المعدل العام
+failure-rate,معدل الرسوب
+create-and-manage-groups,إنشاء وإدارة المجموعات
+create-group,انشاء مجموعة
+grade-per-question,الدرجة / السؤال
+add-settings,أضف المزيد من الإعدادات
+bluebrint-settings-for-question-bank,اعدادات المخطط لبنك الاسئلة 
+maximum-grade,الدرجة الكلية
+choice-at-least-one-question-bank-to-add-settings-for-the-blueprint,اختيار بنك أسئلة واحد على الأقل لإضافة إعدادات للمخطط
+real-time-exam-monitoring,مراقبة الامتحانات الحقيقة
+real-time-exam-monitoring-description,يظهر هذا التقرير مراقبة الامتحانات المباشر
+student-online-status,حالة المسجلين المتصلين
+logged-in,متصل
+disconnected,متصل
+exam-progress-overview,مراقبة تقدم الامتحانات
+live-exam-count,عدد الامتحانات الحقيقية
+total-exam,اجمالي الامتحانات
+user-activity-over-time,نشاط المستخدم بمرور الوقت
+server-load-over-time,حمل الخادم بمرور الوقت
+exam-attendance-breakdown,تحليل حضور الامتحان
+Absentees,المتغيبون
+total-students,إجمالي المسجلين
+created-exam,تم إنشاء الامتحان
+edited-question,تم تعديل السؤال
+reviewed-answer,تمت مراجعة الإجابة
+cheating-fraud-detection-logs,سجلات الغش
+cheating-fraud-detection-logs-description,يظهر هذا التقرير سجلات الغش
+fraud-detection-trend,احصائية الغش
+detected-cheating-cases,حالات الغش المكتشفة
+multiple-faces-detected,تم الكشف عن أكثر من وجه
+tab-switching,تبديل التبويب
+student-id,رقم الطالب
+violation-type,نوع الغش
+time-stamp,الوقت
+flagged,محذوف
+under-review,قيد التدقيق
+audit-questions,الاسئلة
+malwmat-aldkhwl-llkamrat,معلومات الدخول للكامرات
+replace-question,استبدال السؤال
+the-question-will-be-replaced-with-a-new-one-for-all-students,سيتم استبدال السؤال  بسؤال جديد لجميع المسجلين
+you-are-going-to-replace-the-question,سوف يتم استبدال
+question-performance-reports,تقارير أداء الاسئلة
+question-performance-reports-description,يظهر هذا التقرير أداء الاسئلة
+question-success-rate,نسبة أداء الاسئلة
+most-difficult-questions,أصعب الاسئلة
+question-bank-reports,تقارير بنك الأسئلة
+question-performance-analysis,تحليل أداء الأسئلة
+total-questions,إجمالي الأسئلة
+approved-questions,الأسئلة المعتمدة
+rejected-questions,الأسئلة المرفوضة
+view-creators,عرض معدي الاسئلة
+questions-creator,منشئ الأسئلة
+correct-responses,الإجابات الصحيحة
+incorrect-responses,الإجابات الخاطئة
+exam-center-utilization-reports,تقرير استخدام المراكز الامتحانية
+exam-center-utilization-reports-description,يظهر هذا التقرير استخدام المراكز الامتحانية
+exam-center-seat-usage,استخدام المقاعد في المراكز الامتحانية
+real-time-seat-allocation,تعيين المقاعد في الوقت الفعلي
+used,مستخدمة
+unused-seats,غير مستخدمة
+system-performance-dashboard,احصائيات الأداء المنطقي
+system-performance-dashboard-description,يظهر هذا التقرير أداء النظام
+server-load,الحمل المنطقي للخادم
+api-response-times,أوقات استجابة الواجهات البرمجية
+auditors,المدققين
+creators,معدي الاسئلة
+audit-logs-user-activity,السجلات التدقيق وأنشطة المستخدمين
+audit-logs-user-activity-description,يظهر هذا التقرير السجلات التدقيق وأنشطة المستخدمين
+audit-logs-over-time,السجلات التدقيق مع الوقت
+user-actions-breakdown,تفصيل أنشطة المستخدمين
+user-role,الدور الوظيفي
+action-type,نوع العملية
+put-the-correct-order-of-the-answers,ضع الترتيب الصحيح للإجابات
+note,ملاحظة
+users,المستخدمين
+manager,المدراء
+creatorOrAuditor,معد اسئلة او مدقق
+managerLogin,مدير
+confirm-delete,تأكيد الحذف
+edit-subject,تعديل المواد
+save,حفظ
+edit-topic,تعديل موضوع
+college,الكلية
+question_dashboard,احصائيات الاسئلة
+question_dashboard_description,يظهر هذا التقرير احصائيات الاسئلة
+question_performance_analysis,تحليل أداء الأسئلة
+question_approval_and_rejection_report,تقرير الموافقة على السؤال ورفضه
+number_of_questions_asked,عدد الاسئلة المطروحة
+evaluation_speed_trends,اتجاهات سرعة التقييم
+exam_dashboard,احصائيات الامتحان
+exam_dashboard_description,يظهر هذا التقرير احصائيات الامتحان
+student_registration_report,تقرير تسجيل المسجلين
+student_performance_in_exam,أداء الطالب في الامتحان
+exam_supervision,مراقبة الامتحانات
+exam_supervision_report_description,يظهر هذا التقرير المراقبة الامتحانية
+exam_supervision_report,تقرير المراقبة الامتحانية
+live_exam_count,عدد الامتحانات الحقيقية
+total_exam,اجمالي الامتحانات
+admin_dashboard,مراقبة النظام
+admin_dashboard_description,يظهر هذا التقرير مراقبة النظام
+total_number_of_employees,اجمالي عدد الموظفين
+total_number_of_students,اجمالي عدد المسجلين
+total_number_of_examinations_established,عدد الامتحانات الحالية
+exams_rejected_by_the_committee,الامتحانات المرفوضة من قبل اللجنة
+the_number_of_exams_that_have_not_been_conducted,الامتحانات التي لم يتم تنفيذها
+the_number_of_exams_conducted,عدد الامتحانات الحالية
+student_participation,مشاركة المسجلين
+absent,غائب
+present,حاضر
+exam_center_seat_usage,استخدام مقاعد مركز الامتحان
+real_time_seat_allocation,تخصيص المقاعد في الوقت الفعلي
+question_success_rate,معدل نجاح الأسئلة
+most_difficult_questions,أصعب الأسئلة
+series-1,السلسلة 1
+series-2,السلسلة 2
+exam_efficiency,احصائيات الامتحانات
+without_cheating,بدون غش
+cheating,غش
+student_participation_description,من بين 75 طالبًا شاركوا في الامتحانات
+detected_cheating,حالات الغش المكتشفة
+detected_cheating_multi_faces,تم الكشف عن وجوه متعددة
+detected_cheating_tab_switching,تبديل التبويبات
+at_the_college_level,على مستوى الكلية
+system_insights,اداء النظام
+system_insights_report_description,يعرض هذا التقرير رؤى النظام
+api_response_times,أوقات استجابة API
+user_actions_breakdown,تفصيل إجراءات المستخدم
+audit_logs_over_time,سجلات التدقيق بمرور الوقت
+server_load,حمل الخادم
+average_exam_scores,متوسط نتائج الامتحانات
+arrived,وصل
+absence,غياب
+exam_attendance_breakdown,تفصيل وصول الامتحان
+absent_students,المسجلين الغائبين
+attendance_rate,نسبة الحضور
+user_activity_over_time,نشاط المستخدم بمرور الوقت
+series1,السلسلة 1
+series2,السلسلة 2
+total_exam_statistics,اجمالي تقارير الامتحانات
+dashboard_director_of_the_system,واجهة الاحصائيات
+export_reports,تصدير التقارير
+time_for_the_exams,وقت الامتحان
+number_of_completed_exams,عدد الامتحانات المكتملة
+success_rate_in_exams,نسبة النجاح في الامتحانات
+number_of_students_who_took_the_exam,عدد المسجلين الذين تقدموا للامتحان
+number_of_students_who_passed_it,عدد المسجلين الذين اجتازوه
+goal_overview,نظرة عامة على الهدف
+student_dashboard,احصائيات المسجلين
+student_dashboard_description,يظهر هذا التقرير احصائيات المسجلين
+student_dashboard_header,الصفحة الرئيسية لعرض الامتحانات
+student_dashboard_header_description,لعرض الامتحانات التي تم اكمالها وقيد التقدم
+todays_exams,امتحانات اليوم
+not_perform_it,تم الغاءها
+did_not_perform_it,لم ينفذها
+performed,امتحانات مكتملة
+successful,ناجح
+deposit,إيداع
+total_subjects,مجموع المواضيع
+start_mock_exam,بدء الامتحان التجريبي
+login,تسجيل الدخول
+enter-your-email-below-to-login-to-your-account,أدخل بريدك الإلكتروني أدناه لتسجيل الدخول إلى حسابك
+ministry-of-higher-education,وزارة التعليم العالي والبحث العلمي
+ems-is-a-digital-platform-by-the-iraqi-ministry-of-education-designed-to-simplify-academic-management-enhance-learning-and-provide-easy-access-to-educational-data-for-students-teachers-and-administrators,هو منصة رقمية من قبل وزارة التعليم العراقية ، مصممة لتبسيط الإدارة الأكاديمية ، وتعزيز التعلم ، وتوفير سهولة الوصول إلى البيانات التعليمية للطلاب والمعلمين والمسؤول.
+fill-email,ملء البريد الإلكتروني
+exam_efficiency_report_description,يظهر هذا التقرير كفاءة الامتحان
+edit-question-bank,تعديل بنك الاسئلة
+exam-schedule,تقويم الامتحانات
+filters_title,البحث بواسطة :  
+max_grade,الى درجة نجاح 
+min_grade,من درجة نجاح
+max_date,الى تاريخ
+min_date,من تاريخ
+username-or-password-is-incorrect,اسم المستخدم أو كلمة المرور غير صحيح
+questions-banks,بنوك الاسئلة
+exams-management,أدارة الامتحانات
+dashboards,الاحصائيات
+settings,اعدادات النظام
+delete-topic,حذف الموضوع
+are-sure-deleting-this-topic-from-question-bank,هل انت متأكد من حذف هذا الموضوع م بنك الاسئلة
+delete-topic-description,سيتم حذف الموضوع بكل محتوياته ، إذا كان هناك أي سؤال داخل الموضوع ، فلن يتم حذفه.
+add-topic,اضافة موضوع
+edit-examination-center,تعديل المركز الامتحاني
+view_less,عرض أقل
+view_all,عرض الكل
+no_structures_found,لا توجد هياكل لإظهارها
+blueprint_details,تفاصيل المخطط
+blueprint_details_description,يظهر هذا التقرير تفاصيل المخطط
+exam_hall,قاعة الامتحان
+start_time,وقت البدء
+end_time,وقت الانتهاء
+starting_date,تاريخ البدء
+ending_date,تاريخ الانتهاء
+duration_by_Minutes,المدة بالدقائق
+allowed_time_for_entrance,الوقت المسموح للدخول
+exam_type,نوع الامتحان
+student_count,عدد المسجلين
+exam_details,تفاصيل الامتحان
+delete-option,حذف الخيار
+selected-organizational-structure,الاقسام المحددة
+edit_exam,تعديل الامتحان
+reschedule, إعادة جدولة
+exam_already_started_no_changes,الامتحان قد بدأ بالفعل ولا يمكن إجراء أي تغييرات
+cancel_exam,إلغاء الامتحان
+please-fill-in-the-required-fields,يجب إدخال نوع السؤال، مستوى الصعوبة، مستوى المحاور
+total-grade-must-equal-maximum-grade,الدرجة الكلية يجب ان تساوي الدرجة الحد الاقصى
+add-grades,إضافة درجات
+curve,الدرجة المضافة
+class-average,متوسط الصف
+add-a-grades-for-all-student,إضافة درجات لجميع المسجلين
+add-grades-for-all-student-based-on-the-average,إضافة درجات لجميع المسجلين بناءً على المتوسط
+curve-grade,متوسط الدرجات
+tags,العلامات
+you_cannot_add_questions_outside_the_allowed_time_window,لا يمكنك إضافة أسئلة خارج الفترة الزمنية المسموح بها
+you_cannot_edit_questions_outside_the_allowed_time_window,لا يمكنك تعديل الأسئلة خارج الفترة الزمنية المسموح بها
+you_cannot_save_changes_outside_the_allowed_time_window,لا يمكنك حفظ التغييرات خارج الفترة الزمنية المسموح بها
+you_cannot_update_questions_outside_the_allowed_time_window,لا يمكنك تحديث الأسئلة خارج الفترة الزمنية المسموح بها
+creation-start-date,تاريخ بدء الإنشاء
+creation-end-date,تاريخ انتهاء الإنشاء
+exam-instructions,تعليمات الامتحان
+fill-creation-period-dates-optional,تواريخ إنشاء فترة إنشاء الاسئلة (اختياري)
+creation-period,فترة الانشاء 
+failed,راسب
+organizational-structure,جامعة
+import-questions,استيراد الأسئلة
+select-question-type,اختر نوع السؤال
+excel-file,ملف Excel
+questions-imported-successfully,تم استيراد الأسئلة بنجاح
+upload-file,تحميل الملف
+selected-file,الملف المحدد
+categories,التصنيفات
+category,الفئة
+create_and_manage_categories,إنشاء وإدارة الفئات
+add_new_category,إضافة فئة جديدة
+create_new_category,إنشاء فئة جديدة
+category_name,اسم الفئة
+edit_category,تعديل التصنيفات
+subject_code,الرمز
+subject_english_name,الاسم باللغة الإنجليزية
+validation,[object Object]
+end-date-before-start-date,لا يمكن أن يكون تاريخ الانتهاء قبل تاريخ البدء
+end-time-before-start-time,يجب أن يكون وقت الانتهاء بعد وقت البدء
+form-has-errors,يرجى تصحيح الأخطاء في النموذج
+select-a-position,اختر منصبًا
+select-a-course,اختر الدورة الدراسية
+select-categories,حدد تصنيف البنك
+has_curve,الدرجة المضافة
+no_data_available_for_selected_period,لا يوجد بيانات بالفترة المحددة
+image_preview,معاينة الصورة
+image_uploading,جاري تحميل الصورة...
+image_upload_success,تم تحميل الصورة بنجاح!
+image_upload_failed,فشل في تحميل الصورة
+delete_image,حذف الصورة
+end_before_start_date_error,جدول غير صالح: لا يمكن أن يكون تاريخ/وقت انتهاء الامتحان قبل تاريخ/وقت البدء
+same_day_time_error,توقيت غير صالح: للامتحانات في نفس اليوم، يجب أن يكون وقت الانتهاء بعد وقت البدء
+half-success-grade,درجة النجاح
+required,مطلوب
+success,[object Object]
+search-employee,بحث عن موظف
+search-organization,البحث في الهيكل التنظيمي
+max-capacity,عدد المقاعد الكلية ( الحد الاقصى )
+assign-exam-center-manager,تعيين مدير للمركز
+exam-center-managers,مدراء مراكز امتحانية
+surrogate-managers,المدراء البديلين
+exam-center-manager,مدير المركز
+surrogate-manager,اسم المدير البديل
+evaulation-proficiency-description,تظهر إعدادات خاصة بامتحانات الكفاءة، مثل السعر، وعدد المحاولات المسموح بها، وغيرها من التفاصيل ذات الصلة.
+final-description,تظهر إعدادات خاصة بالامتحان التقويمي، ويتم جلب بيانات المسجلين حصريًا من خلال نظام إدارة معلومات الطلبة (SIS).
+view-examination-center,رؤية تفاصيل المركز
+create-hall,انشاء قاعة
+edit-hall,تعديل القاعة
+halls,قاعات المركز
+assign-supervisor,تعيين مراقب للقاعة
+supervisor,مراقب القاعة
+incoming,قادم
+statistics,الاحصائيات
+back-to-examination-centers,العودة إلى المراكز
+exam-center-overview,رؤية تفاصيل المركز
+manage-examination-center-exams,إدارة الامتحانات في المركز
+examination-center-exams,الامتحانات في المركز
+generate-otp,كلمة مرور الامتحان للطالب
+scan-qr-code-instruction,امسح رمز الاستجابة السريعة لإنتاج كلمة المرور
+scan-qr-code-description,ضع رمز الاستجابة السريعة داخل إطار الكاميرا لمسحه تلقائياً وإنتاج كلمة مرور
+camera-preview,ستظهر معاينة الكاميرا هنا
+start-scanning,بدء المسح
+stop-scanning,إيقاف المسح
+qr-code-scanned-successfully,تم مسح رمز الاستجابة السريعة بنجاح، قم بأعطاء هذا الرمز الى الطالب ليتمكن من بدأ الامتحان!
+loading-otp,يتم تحميل الرمز السريع...
+unpaid,غير مدفوع
+paid,مدفوع
+document-number,رقم الهوية
+exam-date,تاريخ الامتحان
+report-issue,ابلاغ عن مشكلة
+time-remaining-for-exam,الوقت المتبقي لأنتهاء للامتحان
+hour,ساعة
+minute,دقيقة
+second,ثانية
+exam-time-expired,انتهى وقت الامتحان
+all-students,جميع المسجلين
+present-students,المسجلين الحاضرين
+absent-students,المسجلين الغائبين
+blacklisted-students,المسجلين المدرجون في القائمة السوداء
+attendance-status,حالة الحضور
+exam-status,حالة الامتحان
+remaining-time,الوقت المتبقي
+progress,التقدم
+checkedInDate,وقت الدخول
+time-remaining-for-start-exam,الوقت المتبقي لبدء الامتحان 
+manager-signature,إدخال التوقيع الشخصي
+signature-instructions,التوقيع الرقمي
+signature-instructions-desc,يرجى إدخال توقيعك الرقمي ليتم استخدامه في الشهادات الرسمية الخاصة بالامتحانات.
+clear,مسح
+draw-signature-above,ارسم توقيعك في الصندوق أعلاه
+signature-required,التوقيع مطلوب قبل الحفظ
+signature-saved-successfully,تم حفظ التوقيع بنجاح
+error-saving-signature,خطأ في حفظ التوقيع. يرجى المحاولة مرة أخرى.
+signature-file-uploaded,تم رفع ملف التوقيع بنجاح
+load-signature-from-file,تحميل التوقيع من ملف
+signature-preview,معاينة التوقيع
+signature-image,صورة التوقيع
+signature-loaded-successfully,تم تحميل التوقيع بنجاح
+error-loading-signature,خطأ في تحميل التوقيع من الملف
+invalid-file-type,نوع ملف غير صحيح. يرجى اختيار ملف صورة.
+signature-exported-successfully,تم تصدير التوقيع بنجاح
+error-exporting-signature,خطأ في تصدير التوقيع
+signature-component-not-available,مكون التوقيع غير متاح
+error-converting-signature,خطأ في تحويل التوقيع إلى ملف
+put-the-pointer-inside-the-box-below,ضع المؤشر داخل الصندوق أدناه
+use-the-mouse-or-touch-screen-to-draw-your-signature,استخدم الماوس أو شاشة اللمس لرسم توقيعك
+if-the-signature-is-not-clear-you-can-press-the-clear-button-to-try-again,إذا لم يكن التوقيع واضحاً، يمكنك الضغط على زر المسح للمحاولة مرة أخرى
+after-completing-press-the-save-button-to-confirm-it-in-the-certificates,بعد الانتهاء، اضغط على زر الحفظ لتأكيده في الشهادات
+student-status,حالة الطالب في الامتحان
+generate-supervisor-otp,إنشاء رمز المشرف لأنهاء الامتحان
+supervisor-otp-title,إنشاء رمز المشرف
+supervisor-otp-description,انقر على الزر أدناه لإنشاء كلمة مرور لمرة واحدة للوصول للمشرف
+generating-supervisor-otp,جارٍ إنشاء رمز المشرف...
+supervisor-otp-generated,تم إنشاء رمز المشرف بنجاح!
+supervisor-otp-code,رمز المشرف
+supervisor-otp-instructions,شارك هذا الرمز مع المشرف للمصادقة
+generate-new-otp,إنشاء رمز جديد
+try-again,حاول مرة أخرى
+close,إغلاق
+mark-as-cheating,تأشير كـ حالة غش
+blacklist-student,إدراج في القائمة السوداء
+student-details,تفاصيل الطالب
+blacklist-warning,تحذير: هذا الإجراء سيؤدي إلى إدراج الطالب نهائياً في القائمة السوداء ومنعه من دخول الامتحانات. لا يمكن التراجع عن هذا الإجراء.
+blacklist-reason,سبب الإدراج في القائمة السوداء
+enter-blacklist-reason,يرجى إدخال سبب إدراج هذا الطالب في القائمة السوداء...
+manage-blacklisted-students,إدارة المسجلين المدرجين في القائمة السوداء
+unblacklist-student,إزالة من القائمة السوداء
+unblacklist,إزالة من القائمة السوداء
+unblacklist-reason,سبب الإزالة من القائمة السوداء
+enter-unblacklist-reason,يرجى إدخال سبب إزالة هذا الطالب من القائمة السوداء...
+unblacklist-warning,هذا الإجراء سيؤدي إلى إزالة الطالب من القائمة السوداء والسماح له بدخول الامتحانات مرة أخرى.
+search-student-name,البحث باسم الطالب
+search-exam-center,البحث بمركز الامتحان
+blacklisted-date,تاريخ الإدراج في القائمة السوداء
+blacklisted,مدرج في القائمة السوداء
+unblacklisted,تم إزالته من القائمة السوداء
+all,الكل
+view-details,عرض التفاصيل
+blacklist,القائمة السوداء
+dialogue,القطعة
+sub-questions,الاسئلة الفرعية
+sub-question,السؤال الفرعي
+sub-question-title,عنوان السؤال الفرعي
+add-sub-question,إضافة سؤال فرعي
+add-first-sub-question,إضافة سؤال فرعي أول
+no-sub-questions,لا يوجد أسئلة فرعية
+add-sub-questions-to-create-dialogue,إضافة اسئلة فرعية لإنشاء القطعة
+this-dialogue-has-no-sub-questions,لا يوجد أسئلة فرعية لهذا القطعة
+show-alternate-title,عرض العنوان باللغة الإنكليزية
+alternate-title,العنوان باللغة الإنكليزية
+enter-alternate-title,أدخل العنوان باللغة الإنكليزية
+no-answer-provided,لا يوجد إجابة
+sunday,الأحد
+monday,الاثنين
+tuesday,الثلاثاء
+wednesday,الأربعاء
+thursday,الخميس
+friday,الجمعة
+saturday,السبت
+available-days,الأيام المتاحة
+reshuffle-questions,اعادة خلط الاسئلة 
+no-supervisors-selected,لم يتم تحديد مراقبين بعد
+assign-supervisors,تعيين المراقبين
+supervisors,المراقبين المحددين

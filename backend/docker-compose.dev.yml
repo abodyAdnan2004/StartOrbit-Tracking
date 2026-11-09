@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # Backend API (Development)
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: orbit-backend-dev
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: file:./dev.db
+      JWT_SECRET: dev-secret-key-change-in-production-min-32-chars-long-enough
+      JWT_EXPIRES_IN: 15m
+      JWT_REFRESH_SECRET: dev-refresh-secret-key-change-in-production-min-32-chars-long
+      JWT_REFRESH_EXPIRES_IN: 7d
+      FRONTEND_URL: http://localhost:3029
+      SOCKET_CORS_ORIGIN: http://localhost:3029
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+      - dev_db:/app/dev.db
+    command: npm run dev
+    networks:
+      - orbit-network
+
+  # Prisma Studio (Development)
+  prisma-studio:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: orbit-prisma-studio-dev
+    command: npx prisma studio --hostname 0.0.0.0 --port 5555
+    environment:
+      DATABASE_URL: file:./dev.db
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./prisma:/app/prisma
+      - dev_db:/app/dev.db
+    networks:
+      - orbit-network
+
+volumes:
+  dev_db:
+
+networks:
+  orbit-network:
+    driver: bridge
