@@ -1,0 +1,17 @@
+<svg width="2732" height="2732" viewBox="0 0 2732 2732" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1D4ED8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="2732" height="2732" fill="url(#bg)"/>
+  <circle cx="1366" cy="1100" r="300" fill="none" stroke="white" stroke-width="20"/>
+  <circle cx="1366" cy="1100" r="100" fill="white"/>
+  <path d="M1366 800 L1366 1000" stroke="white" stroke-width="16" stroke-linecap="round"/>
+  <path d="M1366 1000 L1300 940 M1366 1000 L1432 940" stroke="white" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="1366" cy="1600" r="120" fill="white" opacity="0.2"/>
+  <circle cx="1366" cy="1600" r="60" fill="white" opacity="0.4"/>
+  <text x="1366" y="1850" text-anchor="middle" font-family="system-ui, sans-serif" font-size="80" font-weight="bold" fill="white">Orbit Tracking</text>
+  <text x="1366" y="2000" text-anchor="middle" font-family="system-ui, sans-serif" font-size="36" fill="white" opacity="0.8">Real-time Location Tracking</text>
+</svg>
