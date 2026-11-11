@@ -15,7 +15,6 @@ export interface User {
 export interface Role {
   name: string;
   description: string;
-  isSystemRole: boolean;
   id: string;
   isActive: boolean;
 }

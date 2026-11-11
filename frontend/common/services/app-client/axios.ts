@@ -6,9 +6,7 @@ export const baseURL = import.meta.env.VITE_BASE_URL
 const axiosIns = axios.create({
   baseURL: `${baseURL}api`,
   headers: {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Content-Type': 'application/json',
   },
 })
 
@@ -20,20 +18,24 @@ axiosIns.interceptors.request.use((config) => {
   }
 
   const token = localStorage.getItem('token')
-  const locale = localStorage.getItem('locale')
-  //
-
-  // if (!token) useRouter().push('/login')
+  const locale = localStorage.getItem('locale') || 'en'
 
   if (config.method === 'get') {
     config.params = config.params || {}
   }
+
+  // Ensure headers object exists
   config.headers = config.headers || {}
   config.headers['Accept-Language'] = locale
-  config.headers.Authorization = `Bearer ${token}`
+
+  // Only add Authorization header if token exists and is not empty
+  if (token && token.trim() !== '') {
+    config.headers.Authorization = `Bearer ${token}`
+  }
 
   return config
 })
+
 const getSuccessMessage = (method: string) => {
   const locale = localStorage.getItem('locale') || 'ar'
 
@@ -74,8 +76,7 @@ axiosIns.interceptors.response.use(
   },
   (error) => {
     // Handle error
-    // Handle error
-    if (error.response.data.message) {
+    if (error.response?.data?.message) {
       useToast({
         title: error.response.data.message,
         message: error.response.data.message,
@@ -88,19 +89,19 @@ axiosIns.interceptors.response.use(
         isError: true,
       })
     }
-    // if (!error.response || error.response.status === 401) {
-    //
-    //   useAppUserStore().user = {}
-    //   // Remove "userData" from localStorage
-    //   localStorage.removeItem('userData')
-
-    //   // Remove "accessToken" from localStorage
-    //   localStorage.removeItem('token')
-    //   useRouter().push('/login')
-    // }
+    // Handle 401 Unauthorized - redirect to login
+    if (!error.response || error.response.status === 401) {
+      localStorage.removeItem('userData')
+      localStorage.removeItem('token')
+      localStorage.removeItem('tokenData')
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login'
+      }
+    }
     throw error
   }
 )
+
 axiosIns.defaults.paramsSerializer = (params) => {
   const searchParams = new URLSearchParams()
 
@@ -116,4 +117,5 @@ axiosIns.defaults.paramsSerializer = (params) => {
 
   return searchParams.toString()
 }
+
 export default axiosIns

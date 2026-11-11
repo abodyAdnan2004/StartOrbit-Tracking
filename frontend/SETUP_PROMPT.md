@@ -204,7 +204,7 @@ Update static text in **`features/auth/routes/login.vue`**:
 
 For each feature listed below, follow the **7-step CRUD pattern** documented in `LLM.md`.
 
-> Refer to `features/departments/` as the reference implementation.
+> Refer to `features/users/` as the reference implementation.
 
 ```
 [

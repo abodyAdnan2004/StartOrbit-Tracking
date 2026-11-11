@@ -26,7 +26,7 @@ const hasSlot = (name: string) => !!slots[name]
     :overflow="props.overflowY"
     dir="rtl"
     class="w-[100px] !bg-white dark:!bg-[#010518] dark:text-white"
-    @close="isDialogOpen = true"
+    @close="isDialogOpen = false"
   >
     <template #header>
       <!-- Header -->

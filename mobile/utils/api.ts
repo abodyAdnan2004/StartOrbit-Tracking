@@ -1,8 +1,20 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuthStore } from '@/store/authStore';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api';
+
+// Type for the auth store getter - avoids circular dependency
+type AuthStoreGetter = () => {
+  updateUser: (user: Partial<any>) => void;
+  logout: () => Promise<void>;
+  getState: () => { token: string | null; refreshToken: string | null };
+};
+
+let authStoreGetter: AuthStoreGetter | null = null;
+
+export const setAuthStoreGetter = (getter: AuthStoreGetter) => {
+  authStoreGetter = getter;
+};
 
 class ApiClient {
   private client: AxiosInstance;
@@ -82,8 +94,10 @@ class ApiClient {
               await AsyncStorage.setItem('auth-storage', JSON.stringify(parsed));
             }
 
-            // Update auth store
-            useAuthStore.getState().updateUser({}); // Trigger re-render with new token
+            // Update auth store via getter if available
+            if (authStoreGetter) {
+              authStoreGetter().updateUser({});
+            }
 
             // Process queue
             this.failedQueue.forEach(({ resolve }) => resolve(token));
@@ -96,8 +110,10 @@ class ApiClient {
             this.failedQueue.forEach(({ reject }) => reject(refreshError));
             this.failedQueue = [];
 
-            // Logout user
-            await useAuthStore.getState().logout();
+            // Logout user via getter if available
+            if (authStoreGetter) {
+              await authStoreGetter().logout();
+            }
             throw refreshError;
           } finally {
             this.isRefreshing = false;

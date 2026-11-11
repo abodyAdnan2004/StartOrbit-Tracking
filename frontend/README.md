@@ -259,7 +259,7 @@ admin-vue/
 │
 └── features/                 # Feature modules — one folder per domain
     ├── auth/                 # Login, register, auth store
-    ├── departments/          # Departments CRUD (example feature)
+    ├── users/                # users CRUD (example feature)
     └── home/                 # Dashboard home page
 ```
 

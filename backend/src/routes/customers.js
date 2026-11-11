@@ -7,7 +7,7 @@ import { NotFoundError, ForbiddenError } from '../middleware/errorHandler.js';
 const router = express.Router();
 
 // GET /api/customers - Get all customers with pagination and filters
-router.get('/', requireRole('admin', 'manager'), async (req, res, next) => {
+router.get('/', requireRole('admin'), async (req, res, next) => {
   try {
     const { page, limit, sortBy, sortOrder, search, userId, isActive } = customerFiltersSchema.parse(req.query);
 
@@ -23,7 +23,7 @@ router.get('/', requireRole('admin', 'manager'), async (req, res, next) => {
     if (typeof isActive === 'boolean') where.isActive = isActive;
 
     // If user is not admin/manager, only show their own customers
-    if (!['admin', 'manager'].includes(req.user.role)) {
+    if (!['admin'].includes(req.user.role)) {
       where.userId = req.user.id;
     }
 
@@ -76,7 +76,7 @@ router.get('/:id', async (req, res, next) => {
     }
 
     // Check authorization
-    if (!['admin', 'manager'].includes(req.user.role) && customer.userId !== req.user.id) {
+    if (!['admin'].includes(req.user.role) && customer.userId !== req.user.id) {
       throw new ForbiddenError('Not authorized to view this customer');
     }
 
@@ -87,13 +87,13 @@ router.get('/:id', async (req, res, next) => {
 });
 
 // POST /api/customers - Create new customer
-router.post('/', requireRole('admin', 'manager', 'user'), async (req, res, next) => {
+router.post('/',  async (req, res, next) => {
   try {
     const data = createCustomerSchema.parse(req.body);
 
     // If user is not admin/manager, they can only create customers for themselves
     let userId = data.userId;
-    if (!['admin', 'manager'].includes(req.user.role)) {
+    if (!['admin'].includes(req.user.role)) {
       userId = req.user.id;
     }
 
@@ -141,13 +141,13 @@ router.put('/:id', async (req, res, next) => {
     }
 
     // Check authorization
-    if (!['admin', 'manager'].includes(req.user.role) && customer.userId !== req.user.id) {
+    if (!['admin'].includes(req.user.role) && customer.userId !== req.user.id) {
       throw new ForbiddenError('Not authorized to update this customer');
     }
 
     // If user is not admin/manager, they can't reassign customer
     let userId = data.userId;
-    if (!['admin', 'manager'].includes(req.user.role)) {
+    if (!['admin'].includes(req.user.role)) {
       userId = customer.userId;
     }
 
@@ -175,7 +175,7 @@ router.put('/:id', async (req, res, next) => {
 });
 
 // DELETE /api/customers/:id - Delete customer (soft delete)
-router.delete('/:id', requireRole('admin', 'manager'), async (req, res, next) => {
+router.delete('/:id', requireRole('admin'), async (req, res, next) => {
   try {
     const id = req.params.id;
     // Validate UUID format
@@ -216,7 +216,7 @@ router.get('/:id/locations', async (req, res, next) => {
     }
 
     // Check authorization
-    if (!['admin', 'manager'].includes(req.user.role) && customer.userId !== req.user.id) {
+    if (!['admin'].includes(req.user.role) && customer.userId !== req.user.id) {
       throw new ForbiddenError('Not authorized to view this customer\'s locations');
     }
 

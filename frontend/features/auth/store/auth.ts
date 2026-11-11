@@ -92,8 +92,8 @@ export const useAuthStore = defineStore('auth-store', () => {
   }
 
   const hasRole = (roleName: string) => {
-    if (!userData.value || !userData.value.roles) return false
-    return userData.value.roles.some((role: Role) => role.name === roleName)
+    if (!userData.value || !userData.value.role) return false
+    return userData.value.role === roleName
   }
 
   const logout = () => {

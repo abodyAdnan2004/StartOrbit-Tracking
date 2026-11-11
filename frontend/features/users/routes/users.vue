@@ -43,9 +43,8 @@ onUnmounted(() => {
   <div>
     <AppCrud
       title="Users"
-      add-button-text="Add User"
-      :add-btn-action="() => (store.isCreateDialogOpen = true)"
-      :pagination="true"
+      add-text="Add User"
+      :add-action="() => store.setCreateDialog(true)"
       :total-pages="store.totalPages"
       @update:current-page="filters.pageNumber = $event"
     >
@@ -75,8 +74,8 @@ onUnmounted(() => {
         </template>
 
         <template #data-role="{ item }">
-          <BaseBadge :color="item.role.isSystemRole ? 'purple' : 'blue'" :dot="true">
-            {{ item.role.name }}
+          <BaseBadge color="blue" :dot="true">
+            {{ item.role }}
           </BaseBadge>
         </template>
 

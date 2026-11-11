@@ -1,8 +1,7 @@
-<script lang="ts" setup>
-defineProps<{
-  isOpen: boolean
-}>()
+<script setup lang="ts">
+import { useCollapse } from '~/common/layers/tairo-layout-collapse/composables/collapse'
 
+const { isOpen } = useCollapse()
 const version = import.meta.env.VITE_APP_VERSION
 </script>
 

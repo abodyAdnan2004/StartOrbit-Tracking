@@ -9,11 +9,15 @@ export default function Index() {
 
   useEffect(() => {
     if (isHydrated) {
-      if (token) {
-        router.replace('/(tabs)');
-      } else {
-        router.replace('/auth/login');
-      }
+      // Use setTimeout to defer navigation until after the Stack is mounted
+      const timer = setTimeout(() => {
+        if (token) {
+          router.replace('/customers');
+        } else {
+          router.replace('/auth/login');
+        }
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isHydrated, token, router]);
 

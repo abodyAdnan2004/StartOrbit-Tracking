@@ -14,9 +14,4 @@ export default [
     icon: { name: 'ph-radar-duotone', class: 'w-5 h-5' },
     to: '/tracking',
   },
-  {
-    name: 'Departments',
-    icon: { name: 'ph-buildings-duotone', class: 'w-5 h-5' },
-    to: '/departments',
-  },
 ]

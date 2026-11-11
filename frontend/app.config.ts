@@ -37,9 +37,6 @@ export default defineAppConfig({
         items: pages as any,
         footer: {
           component: 'NavigationFooter',
-          props: {
-            class: 'w-100% text-center',
-          },
         },
       },
     },

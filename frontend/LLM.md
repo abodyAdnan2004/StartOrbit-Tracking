@@ -122,7 +122,7 @@ project-root/
 │
 └── features/               # ★ Feature modules — one folder per domain
     ├── auth/
-    ├── departments/
+    ├── users/
     ├── home/
     └── …
 ```
@@ -263,10 +263,13 @@ export const useFeatureStore = defineStore('feature', () => {
     name: null,
   })
 
-  const isCreateDialogOpen = ref(false)
-  const isEditDialogOpen = ref(false)
+  const isCreateDialogOpen = ref<boolean>(false)
+  const isEditDialogOpen = ref<boolean>(false)
   const selectedItemId = ref<number | null>(null)
   const selectedItem = ref<FeatureDto | null>(null)
+
+  const setCreateDialog = (val: boolean) => (isCreateDialogOpen.value = isCreateDialogOpen)
+  const setEditDialog = (val: boolean) => (isEditDialogOpen.value = isEditDialogOpen)
 
   const getAll = async () => {
     try {
@@ -460,6 +463,7 @@ const submit = async () => {
 <script setup lang="ts">
 import AppCrudActions from '~/common/components/app-crud/components/AppCrudActions.vue'
 import AppTable from '~/common/components/app-table/AppTable.vue'
+import AppInputField from 'frontend/common/components/app-field/AppInputField.vue'
 import { useAppTableStore } from '~/common/components/app-table/stores/AppTableStore'
 import { tableHeader } from '~/features/feature'
 import FeatureCreate from '~/features/feature/components/FeatureCreate.vue'
@@ -503,14 +507,13 @@ onUnmounted(() => {
   <div>
     <AppCrud
       title="عنوان القسم"
-      add-button-text="إضافة جديد"
-      :add-btn-action="() => (store.isCreateDialogOpen = true)"
-      :pagination="true"
+      add-text="إضافة جديد"
+      :add-action="() => (store.isCreateDialogOpen = true)"
       :total-pages="store.totalPages"
       @update:current-page="filters.pageNumber = $event"
     >
       <template #filters>
-        <BaseInput v-model="filters.name" placeholder="البحث" />
+        <AppInputField v-model="filters.name" placeholder="البحث" />
       </template>
 
       <AppTable title="عنوان القسم" :headers="tableHeader()" :items="items" :is-loading="isLoading">
@@ -528,7 +531,7 @@ onUnmounted(() => {
                 store.isEditDialogOpen = true
               }
             "
-            :delete-service="store.remove"
+            :delete-service="(id: string) => store.remove(id)"
           />
         </template>
       </AppTable>
@@ -566,9 +569,9 @@ For a grouped dropdown in the sidebar use `children: [...]` instead of `to`.
 | Prop / Slot                    | Purpose                             |
 | ------------------------------ | ----------------------------------- |
 | `title`                        | Page heading                        |
-| `add-button-text`              | Label for the add button            |
-| `:add-btn-action`              | Callback when add button is clicked |
-| `:pagination` + `:total-pages` | Enables bottom pagination           |
+| `add-text`.                    | Label for the add button            |
+| `:add-action`.                 | Callback when add button is clicked |
+| `:total-pages`                 | Enables bottom pagination           |
 | `@update:current-page`         | Emitted when page changes           |
 | `#filters` slot                | Search inputs and filter dropdowns  |
 

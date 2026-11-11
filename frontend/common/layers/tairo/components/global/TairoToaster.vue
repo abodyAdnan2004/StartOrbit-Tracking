@@ -98,7 +98,7 @@ const iconClasses = computed(() => {
         class="h-1 rounded-es-lg"
         :class="progressClasses"
         :style="{
-          width: `${percent * 100}%`,
+          width: `${percent.value * 100}%`,
         }"
       />
     </div>

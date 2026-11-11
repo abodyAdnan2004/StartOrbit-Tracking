@@ -4,12 +4,10 @@ import AppAutoCompleteField from '~/common/components/app-field/AppAutoCompleteF
 import { requiredValidator, emailValidator, minLengthValidator } from '~/common/services/validation'
 import { Validator } from '~/common/services/validator'
 import { useUserStore } from '../store'
-// import { useRoleStore } from '~/features/roles/store'
-import type { UserUpdateDto, Role } from '../types'
+import type { UserUpdateDto } from '../types'
 import type { ApiError } from '~/common/utils/types/ApiResponses'
 
 const store = useUserStore()
-// const roleStore = useRoleStore()
 
 const validator = new Validator<UserUpdateDto>(
   {
@@ -39,9 +37,9 @@ const body = validator.validation
 const submit = async () => {
   if (!(await body.value.$validate())) return
   try {
-    await store.update({ ...validator.extractBody(), id: store.selectedItemId.value })
+    await store.update({ ...validator.extractBody(), id: store.selectedItemId })
     validator.resetBody()
-    store.isEditDialogOpen.value = false
+    store.setEditDialog(false)
   } catch (error) {
     const errors = (error as ApiError).response?.data?.errors
     if (errors) validator.setExternalErrors(errors)
@@ -52,16 +50,11 @@ const resetForm = () => {
   validator.resetBody()
 }
 
-onMounted(async () => {
-  //   await roleStore.getAll()
-})
-
 watch(
   () => store.isEditDialogOpen,
   async (val) => {
     if (val) {
       resetForm()
-      //   await roleStore.getAll()
       if (store.selectedItem) {
         body.value.username.$model = store.selectedItem.value?.username
         body.value.email.$model = store.selectedItem.value?.email
@@ -77,7 +70,7 @@ watch(
 </script>
 
 <template>
-  <AppDialog v-model="store.isEditDialogOpen.value" title="Edit User" size="xl">
+  <AppDialog v-model="store.isEditDialogOpen" title="Edit User" size="xl">
     <div class="flex flex-col gap-4 p-3">
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <AppInputField
@@ -115,7 +108,16 @@ watch(
           v-model="body.role.$model"
           :errors="body.role.$errors"
           label="Role"
-          :get-url="'/roles'"
+          :items="[
+            {
+              value: 'admin',
+              name: 'Admin',
+            },
+            {
+              value: 'user',
+              name: 'User',
+            },
+          ]"
           :fetch-on-search="false"
           item-label="name"
           item-value="id"
@@ -134,7 +136,7 @@ watch(
       </div>
     </div>
     <template #actions>
-      <BaseButton color="warning" variant="outline" @click="store.isEditDialogOpen.value = false">
+      <BaseButton color="warning" variant="outline" @click="store.setEditDialog(false)">
         Cancel
       </BaseButton>
       <BaseButton color="primary" :loading="store.isLoading.value" @click="submit">

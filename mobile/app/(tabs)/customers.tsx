@@ -74,7 +74,7 @@ export default function CustomersScreen() {
     setShowAddModal(true);
   };
 
-  const handleDelete = (customerId: number) => {
+  const handleDelete = (customerId: string) => {
     Alert.alert('Delete Customer', 'Are you sure you want to delete this customer?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: () => deleteCustomer(customerId) },

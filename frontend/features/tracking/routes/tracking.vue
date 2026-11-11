@@ -10,7 +10,7 @@ const authStore = useAuthStore()
 onMounted(() => {
   // Initialize tracking store
   if (authStore.token) {
-    if (authStore.userData.value.role === 'admin' || authStore.userData.value.role === 'manager') {
+    if (authStore.userData.role === 'admin') {
       trackingStore.loadLatestLocations()
     } else {
       trackingStore.loadCustomers()
@@ -49,14 +49,14 @@ onUnmounted(() => {
             <Icon name="ph:user-duotone" class="size-4 text-primary-600" />
           </div>
           <span class="hidden text-sm font-medium text-gray-700 sm:block">
-            {{ authStore.userData.value.fullName }}
+            {{ authStore.userData.fullName }}
           </span>
         </div>
       </div>
     </header>
 
     <!-- Main content -->
-    <main class="relative flex-1">
+    <main class="relative flex min-h-0 flex-1">
       <TrackingMap />
     </main>
   </div>

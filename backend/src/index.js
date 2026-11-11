@@ -33,7 +33,15 @@ export const prisma = new PrismaClient({
 // Initialize Socket.io
 export const io = new Server(httpServer, {
 	cors: {
-		origin: process.env.SOCKET_CORS_ORIGIN || "http://localhost:3065",
+		origin: [
+			process.env.SOCKET_CORS_ORIGIN || "http://localhost:3065",
+			"http://localhost:3065",
+			"http://127.0.0.1:3065",
+			"http://localhost:3000",
+			"http://10.0.2.2:3000", // Android emulator
+			"exp://192.168.0.126:8081", // Expo development (mobile device)
+			"exp://127.0.0.1:8081", // Expo development (local)
+		],
 		methods: ["GET", "POST"],
 		credentials: true,
 	},
@@ -45,25 +53,35 @@ app.use(
 		crossOriginResourcePolicy: { policy: "cross-origin" },
 	}),
 );
-app.use(
-	cors({
-		origin: (origin, callback) => {
-			const allowedOrigins = [
-				process.env.FRONTEND_URL || "http://localhost:3029",
-				"http://localhost:3065",
-				"http://127.0.0.1:3065",
-			];
-			if (!origin || allowedOrigins.includes(origin)) {
-				callback(null, true);
-			} else {
-				callback(new Error("Not allowed by CORS"));
-			}
-		},
-		credentials: true,
-		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-		allowedHeaders: ["Content-Type", "Authorization"],
-	}),
-);
+const corsOptions = {
+	origin: (origin, callback) => {
+		const allowedOrigins = [
+			process.env.FRONTEND_URL || "http://localhost:3029",
+			"http://localhost:3065",
+			"http://127.0.0.1:3065",
+			"http://localhost:3000",
+			"http://10.0.2.2:3000", // Android emulator
+			"exp://127.0.0.1:8081", // Expo development
+		];
+		// Allow requests with no origin (mobile apps, curl, etc.)
+		if (!origin || allowedOrigins.includes(origin)) {
+			callback(null, true);
+		} else {
+			callback(new Error("Not allowed by CORS"));
+		}
+	},
+	credentials: true,
+	methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+	allowedHeaders: [
+		"Content-Type",
+		"Authorization",
+		"access-control-allow-methods",
+		"access-control-allow-headers",
+		"access-control-allow-origin",
+	],
+};
+
+app.use(cors(corsOptions));
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

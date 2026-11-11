@@ -6,7 +6,6 @@ export interface Role {
   id: string
   name: string
   description: string | null
-  isSystemRole: boolean
   isActive: boolean
 }
 
@@ -19,7 +18,7 @@ export interface UserDto extends BaseDto {
   lastName: string
   fullName: string
   phoneNumber: string | null
-  role: Role
+  role: string
   isActive: boolean
 }
 

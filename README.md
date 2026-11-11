@@ -32,7 +32,7 @@ Real-time location tracking system with a web dashboard, backend API, and mobile
 ```
 orbit-tracking/
 ├── frontend/          # Nuxt 4 Dashboard
-│   ├── features/      # Feature modules (auth, departments, etc.)
+│   ├── features/      # Feature modules (auth, users, etc.)
 │   ├── common/        # Shared components, services, utils
 │   └── server/        # Server-side code
 ├── backend/           # Node.js/Express API

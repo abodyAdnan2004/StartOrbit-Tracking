@@ -5,9 +5,8 @@ import { requiredValidator, emailValidator, minLengthValidator } from '~/common/
 import { Validator } from '~/common/services/validator'
 import { useUserStore } from '../store'
 // import { useRoleStore } from '~/features/roles/store'
-import type { UserCreateDto, Role } from '../types'
+import type { UserCreateDto } from '../types'
 import type { ApiError } from '~/common/utils/types/ApiResponses'
-
 const store = useUserStore()
 // // const roleStore = useRoleStore()
 
@@ -47,7 +46,7 @@ const submit = async () => {
   try {
     await store.create(validator.extractBody())
     validator.resetBody()
-    store.isCreateDialogOpen.value = false
+    store.setCreateDialog(false)
   } catch (error) {
     const errors = (error as ApiError).response?.data?.errors
     if (errors) validator.setExternalErrors(errors)
@@ -59,7 +58,9 @@ const resetForm = () => {
 }
 
 onMounted(async () => {
-  //   await roleStore.getAll()
+    //   await roleStore.getAll()
+console.log(store.isCreateDialogOpen)
+  
 })
 
 watch(
@@ -159,7 +160,7 @@ watch(
         @click="
           () => {
             resetForm()
-            store.isCreateDialogOpen.value = false
+            store.setCreateDialog(false)
           }
         "
       >

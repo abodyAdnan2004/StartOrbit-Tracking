@@ -30,5 +30,5 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
   ],
-  "exclude": ["node_modules", "dist", "web-build", "android", "ios"]
+  "exclude": ["./node_modules", "dist", "web-build", "android", "ios"]
 }

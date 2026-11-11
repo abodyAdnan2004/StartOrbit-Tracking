@@ -6,6 +6,7 @@ import type {
   TrackingCustomer,
   MapConfig,
 } from '../types'
+import { io, Socket } from 'socket.io-client'
 
 export const useTrackingStore = defineStore('tracking', () => {
   const authStore = useAuthStore()
@@ -44,73 +45,67 @@ export const useTrackingStore = defineStore('tracking', () => {
   })
 
   // Map configuration
-  const mapConfig = ref<MapConfig>({
-    center: [40.7128, -74.006] as [number, number], // Default to NYC
-    zoom: 13,
-    maxZoom: 19,
-    minZoom: 2,
-  })
+    const mapConfig = ref<MapConfig>({
+      center: [33.3128, 44.3615] as [number, number], // Default to NYC
+      zoom: 13,
+      maxZoom: 19,
+      minZoom: 2,
+    })
 
   // Socket connection
-  let socket: WebSocket | null = null
+  let socket: Socket | null = null
   const isConnected = ref(false)
 
   // Initialize socket connection
   const initSocket = () => {
     if (!authStore.token) return
 
-    const wsUrl = `ws://localhost:3000`
-    socket = new WebSocket(wsUrl)
+    const wsUrl = `http://localhost:3000`
+    socket = io(wsUrl, {
+      auth: {
+        token: authStore.token,
+      },
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionDelay: 5000,
+      reconnectionAttempts: Infinity,
+    })
 
-    socket.onopen = () => {
+    socket.on('connect', () => {
       console.log('Socket connected')
       isConnected.value = true
-      // Authenticate
-      socket?.send(JSON.stringify({ type: 'authenticate', token: authStore.token }))
-    }
+    })
 
-    socket.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data)
-        handleSocketMessage(data)
-      } catch (error) {
-        console.error('Socket message parse error:', error)
-      }
-    }
-
-    socket.onclose = () => {
-      console.log('Socket disconnected')
+    socket.on('disconnect', (reason) => {
+      console.log('Socket disconnected:', reason)
       isConnected.value = false
-      // Reconnect after 5 seconds
-      setTimeout(initSocket, 5000)
-    }
+    })
 
-    socket.onerror = (error) => {
-      console.error('Socket error:', error)
-    }
-  }
+    socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error)
+    })
 
-  const handleSocketMessage = (data: any) => {
-    switch (data.type) {
-      case 'auth:success':
-        console.log('Socket authenticated')
-        break
-      case 'location:update':
-        updateUserLocation(data)
-        break
-      case 'user:online':
-        console.log('User online:', data)
-        break
-      case 'user:offline':
-        console.log('User offline:', data)
-        removeUserLocation(data.userId)
-        break
-    }
+    socket.on('auth:success', () => {
+      console.log('Socket authenticated')
+    })
+
+    socket.on('location:update', (data: UserLocation) => {
+      updateUserLocation(data)
+    })
+
+    socket.on('user:online', (data) => {
+      console.log('User online:', data)
+    })
+
+    socket.on('user:offline', (data) => {
+      console.log('User offline:', data)
+      removeUserLocation(data.userId)
+    })
   }
 
   const updateUserLocation = (data: UserLocation) => {
     // Update current user's location
-    if (data.userId === authStore.userData.value.id) {
+    if (data.userId === authStore.userData.id) {
       currentLocation.value = data
       // Update map center
       mapConfig.value.center = [data.latitude, data.longitude]
@@ -131,10 +126,10 @@ export const useTrackingStore = defineStore('tracking', () => {
 
   // Fetch current user's customers
   const loadCustomers = async () => {
-    if (!authStore.userData.value.id) return
+    if (!authStore.userData.id) return
     try {
       customersLoading.value = true
-      customers.value = await locationService.getCustomers(authStore.userData.value.id)
+      customers.value = await locationService.getCustomers(authStore.userData.id)
     } catch (error) {
       console.error('Failed to load customers:', error)
     } finally {
@@ -144,11 +139,11 @@ export const useTrackingStore = defineStore('tracking', () => {
 
   // Load location history
   const loadHistory = async (page = 1) => {
-    if (!authStore.userData.value.id) return
+    if (!authStore.userData.id) return
     try {
       historyLoading.value = true
       filters.value.pageNumber = page
-      const response = await locationService.getByUser(authStore.userData.value.id, filters.value)
+      const response = await locationService.getByUser(authStore.userData.id, filters.value)
       if (page === 1) {
         locationHistory.value = response.items
       } else {
@@ -164,10 +159,10 @@ export const useTrackingStore = defineStore('tracking', () => {
 
   // Load distance stats
   const loadDistanceStats = async (startDate?: string, endDate?: string) => {
-    if (!authStore.userData.value.id) return
+    if (!authStore.userData.id) return
     try {
       distanceStats.value = await locationService.getDistanceStats(
-        authStore.userData.value.id,
+        authStore.userData.id,
         startDate,
         endDate
       )
@@ -189,7 +184,7 @@ export const useTrackingStore = defineStore('tracking', () => {
   onMounted(() => {
     if (authStore.token) {
       initSocket()
-      if (authStore.userData.value.role === 'admin') {
+      if (authStore.userData.role === 'admin') {
         loadLatestLocations()
       } else {
         loadCustomers()
@@ -200,7 +195,7 @@ export const useTrackingStore = defineStore('tracking', () => {
 
   onUnmounted(() => {
     if (socket) {
-      socket.close()
+      socket.disconnect()
       socket = null
     }
   })

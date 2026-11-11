@@ -6,7 +6,7 @@ import { NotFoundError } from '../middleware/errorHandler.js';
 const router = express.Router();
 
 // All report routes require admin or manager role
-router.use(requireRole('admin', 'manager'));
+router.use(requireRole('admin'));
 
 // GET /api/reports/dashboard - Main dashboard summary
 router.get('/dashboard', async (req, res, next) => {

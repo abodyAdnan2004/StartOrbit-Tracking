@@ -1,5 +1,11 @@
 import { userService } from '../service'
-import type { UserDto, UserCreateDto, UserUpdateDto, UserFilters, ChangePasswordDto } from '../types'
+import type {
+  UserDto,
+  UserCreateDto,
+  UserUpdateDto,
+  UserFilters,
+  ChangePasswordDto,
+} from '../types'
 import { useToast } from '~/common/composables/toaster'
 
 export const useUserStore = defineStore('users', () => {
@@ -16,11 +22,14 @@ export const useUserStore = defineStore('users', () => {
     isActive: null,
   })
 
-  const isCreateDialogOpen = ref(false)
-  const isEditDialogOpen = ref(false)
-  const isChangePasswordDialogOpen = ref(false)
+  const isCreateDialogOpen = ref<boolean>(false)
+  const isEditDialogOpen = ref<boolean>(false)
+  const isChangePasswordDialogOpen = ref<boolean>(false)
   const selectedItemId = ref<string | null>(null)
   const selectedItem = ref<UserDto | null>(null)
+
+  const setCreateDialog = (value: boolean) => (isCreateDialogOpen.value = value)
+  const setEditDialog = (value: boolean) => (isEditDialogOpen.value = value)
 
   const getAll = async () => {
     try {
@@ -121,5 +130,7 @@ export const useUserStore = defineStore('users', () => {
     changePassword,
     setSelected,
     openChangePasswordDialog,
+    setCreateDialog,
+    setEditDialog,
   }
 })
