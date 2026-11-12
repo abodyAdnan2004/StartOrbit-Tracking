@@ -1,52 +1,37 @@
 import { io, Socket } from 'socket.io-client';
-import { useAuthStore } from '@/store/authStore';
-import { useLocationStore } from '@/store/locationStore';
-import Constants from 'expo-constants';
+import { getSocketBaseUrl } from './apiConfig';
 
-// Get the API base URL from Expo config or environment
-// For mobile devices, we need to use the machine's IP, not localhost
-const getApiBaseUrl = (): string => {
-  // First check environment variable
-  if (process.env.EXPO_PUBLIC_API_URL) {
-    return process.env.EXPO_PUBLIC_API_URL.replace('/api', '');
-  }
-
-  // Try to get from Expo config (extra.apiUrl)
-  const extraApiUrl = Constants.expoConfig?.extra?.apiUrl;
-  if (extraApiUrl) {
-    return extraApiUrl.replace('/api', '');
-  }
-
-  // For Expo development, try to detect the host from the manifest URL
-  // This works when running on physical device via Expo Go
-  if (Constants.manifest2?.extra?.apiUrl) {
-    return Constants.manifest2.extra.apiUrl.replace('/api', '');
-  }
-
-  // Fallback: try to construct from the debugger host
-  // This works for iOS simulator and Android emulator
-  if (__DEV__ && Constants.manifest?.debuggerHost) {
-    const host = Constants.manifest.debuggerHost.split(':')[0];
-    return `http://${host}:3000`;
-  }
-
-  // Default fallback
-  return 'http://localhost:3000';
-};
-
-const API_BASE_URL = getApiBaseUrl();
+const SOCKET_BASE_URL = getSocketBaseUrl();
 
 let socket: Socket | null = null;
 
+// Callbacks to avoid circular dependency with locationStore
+let onConnectCallback: (() => void) | null = null;
+let onDisconnectCallback: ((reason: string) => void) | null = null;
+let onConnectErrorCallback: ((error: Error) => void) | null = null;
+let onAuthErrorCallback: (() => void) | null = null;
+
+export const setSocketCallbacks = (callbacks: {
+  onConnect?: () => void;
+  onDisconnect?: (reason: string) => void;
+  onConnectError?: (error: Error) => void;
+  onAuthError?: () => void;
+}) => {
+  onConnectCallback = callbacks.onConnect ?? null;
+  onDisconnectCallback = callbacks.onDisconnect ?? null;
+  onConnectErrorCallback = callbacks.onConnectError ?? null;
+  onAuthErrorCallback = callbacks.onAuthError ?? null;
+};
+
 export const initializeSocket = (token: string) => {
   if (socket?.connected) {
-    console.log('Socket already connected to:', API_BASE_URL);
+    console.log('Socket already connected to:', SOCKET_BASE_URL);
     return socket;
   }
 
-  console.log('Initializing socket connection to:', API_BASE_URL);
+  console.log('Initializing socket connection to:', SOCKET_BASE_URL);
 
-  socket = io(API_BASE_URL, {
+  socket = io(SOCKET_BASE_URL, {
     transports: ['websocket', 'polling'],
     reconnection: true,
     reconnectionAttempts: 10,
@@ -60,17 +45,17 @@ export const initializeSocket = (token: string) => {
     console.log('Socket connected:', socket?.id);
     // Send authentication token after connection
     socket?.emit('authenticate', token);
-    useLocationStore.getState().setOnlineStatus(true);
+    onConnectCallback?.();
   });
 
   socket.on('disconnect', (reason) => {
     console.log('Socket disconnected:', reason);
-    useLocationStore.getState().setOnlineStatus(false);
+    onDisconnectCallback?.(reason);
   });
 
   socket.on('connect_error', (error) => {
     console.error('Socket connection error:', error.message);
-    useLocationStore.getState().setOnlineStatus(false);
+    onConnectErrorCallback?.(error);
   });
 
   socket.on('auth:success', (data) => {
@@ -79,10 +64,7 @@ export const initializeSocket = (token: string) => {
 
   socket.on('auth:error', (data) => {
     console.error('Socket auth error:', data);
-    // Token might be expired, try to refresh
-    useAuthStore.getState().refreshAccessToken().catch(() => {
-      useAuthStore.getState().logout();
-    });
+    onAuthErrorCallback?.();
   });
 
   // Listen for location updates from other users (for admin/manager)

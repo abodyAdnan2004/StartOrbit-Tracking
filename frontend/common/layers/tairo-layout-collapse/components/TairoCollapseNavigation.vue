@@ -56,7 +56,7 @@ const endMenuItems = computed(() =>
             class="nui-focus flex cursor-pointer items-center gap-4 rounded-lg py-3 text-muted-400 transition-colors duration-300 hover:bg-muted-700/60 hover:text-muted-200"
             :class="!isOpen ? 'justify-center px-1' : 'px-4'"
           >
-            <Icon :name="item.icon.name" :class="item.icon.class" />
+            <Icon v-if="item.icon?.name" :name="item.icon.name" :class="item.icon.class" />
             <span class="whitespace-nowrap font-sans text-sm" :class="!isOpen ? 'hidden' : 'block'">
               {{ item.name }}
             </span>
@@ -68,7 +68,7 @@ const endMenuItems = computed(() =>
             :class="!isOpen ? 'justify-center px-1' : 'px-4'"
             @click="item.click"
           >
-            <Icon :name="item.icon.name" :class="item.icon.class" />
+            <Icon v-if="item.icon?.name" :name="item.icon.name" :class="item.icon.class" />
             <span class="whitespace-nowrap font-sans text-sm" :class="!isOpen ? 'hidden' : 'block'">
               {{ item.name }}
             </span>
@@ -98,7 +98,7 @@ const endMenuItems = computed(() =>
             class="nui-focus flex cursor-pointer items-center gap-4 rounded-lg py-3 text-muted-400 transition-colors duration-300 hover:bg-muted-700/60 hover:text-muted-200"
             :class="!isOpen ? 'justify-center px-1' : 'px-4'"
           >
-            <Icon :name="item.icon.name" :class="item.icon.class" />
+            <Icon v-if="item.icon?.name" :name="item.icon.name" :class="item.icon.class" />
             <span class="whitespace-nowrap font-sans text-sm" :class="!isOpen ? 'hidden' : 'block'">
               {{ item.name }}
             </span>
@@ -110,7 +110,7 @@ const endMenuItems = computed(() =>
             :class="!isOpen ? 'justify-center px-1' : 'px-4'"
             @click="item.click"
           >
-            <Icon :name="item.icon.name" :class="item.icon.class" />
+            <Icon v-if="item.icon?.name" :name="item.icon.name" :class="item.icon.class" />
             <span class="whitespace-nowrap font-sans text-sm" :class="!isOpen ? 'hidden' : 'block'">
               {{ item.name }}
             </span>

@@ -18,7 +18,11 @@ import { Ionicons } from "@expo/vector-icons";
 import MapView, { Marker, Callout } from "react-native-maps";
 import { useAuthStore } from "@/store/authStore";
 import { useCustomerStore } from "@/store/customerStore";
-import { Customer, CustomerCreateRequest, CustomerUpdateRequest } from "@/types/customer";
+import {
+	Customer,
+	CustomerCreateRequest,
+	CustomerUpdateRequest,
+} from "@/types/customer";
 
 export default function CustomersScreen() {
 	const { token, user, isHydrated } = useAuthStore();
@@ -36,24 +40,28 @@ export default function CustomersScreen() {
 	} = useCustomerStore();
 	const [refreshing, setRefreshing] = useState(false);
 	const [showAddModal, setShowAddModal] = useState(false);
-const [editingCustomer, setEditingCustomer] = useState<Customer | null>(
-	null,
-);
-const [showLocationPicker, setShowLocationPicker] = useState(false);
-const [locationPickerCustomer, setLocationPickerCustomer] = useState<Customer | null>(null);
-const [pickedLocation, setPickedLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-const [formData, setFormData] = useState<CustomerCreateRequest>({
-	name: "",
-	email: "",
-	phone: "",
-	address: "",
-	notes: "",
-	userId: user?.id || "",
-	longitude: null,
-	latitude: null,
-	status: "pending",
-});
-const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+	const [editingCustomer, setEditingCustomer] = useState<Customer | null>(
+		null,
+	);
+	const [showLocationPicker, setShowLocationPicker] = useState(false);
+	const [locationPickerCustomer, setLocationPickerCustomer] =
+		useState<Customer | null>(null);
+	const [pickedLocation, setPickedLocation] = useState<{
+		latitude: number;
+		longitude: number;
+	} | null>(null);
+	const [formData, setFormData] = useState<CustomerCreateRequest>({
+		name: "",
+		email: "",
+		phone: "",
+		address: "",
+		notes: "",
+		userId: user?.id || "",
+		longitude: null,
+		latitude: null,
+		status: "pending",
+	});
+	const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
 	// Don't render until hydrated
 	if (!isHydrated) {
@@ -108,83 +116,86 @@ const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 	};
 
 	const handleSubmit = async () => {
-	if (!validateForm()) return;
+		if (!validateForm()) return;
 
-	try {
-		if (editingCustomer) {
-			await updateCustomer(editingCustomer.id, formData);
-			setShowAddModal(false);
-			setEditingCustomer(null);
-			resetForm();
-		} else {
-			const newCustomer = await createCustomer(formData);
-			setShowAddModal(false);
-			setEditingCustomer(null);
-			resetForm();
-			// Open location picker for the new customer
-			setLocationPickerCustomer(newCustomer);
-			setShowLocationPicker(true);
+		try {
+			if (editingCustomer) {
+				await updateCustomer(
+					editingCustomer.id,
+					formData as CustomerUpdateRequest,
+				);
+				setShowAddModal(false);
+				setEditingCustomer(null);
+				resetForm();
+			} else {
+				const newCustomer = await createCustomer(formData);
+				setShowAddModal(false);
+				setEditingCustomer(null);
+				resetForm();
+				// Open location picker for the new customer
+				setLocationPickerCustomer(newCustomer);
+				setShowLocationPicker(true);
+			}
+		} catch (error: any) {
+			Alert.alert("Error", error.message || "Failed to save customer");
 		}
-	} catch (error: any) {
-		Alert.alert("Error", error.message || "Failed to save customer");
-	}
-};
+	};
 
 	const handleEdit = (customer: Customer) => {
-	setEditingCustomer(customer);
-	setFormData({
-		name: customer.name,
-		email: customer.email || "",
-		phone: customer.phone || "",
-		address: customer.address || "",
-		notes: customer.notes || "",
-		userId: customer.userId || user?.id || "",
-		longitude: customer.location?.[0] ?? null,
-		latitude: customer.location?.[1] ?? null,
-		status: customer.status || "pending",
-	});
-	setShowAddModal(true);
-};
+		setEditingCustomer(customer);
+		setFormData({
+			name: customer.name,
+			email: customer.email || "",
+			phone: customer.phone || "",
+			address: customer.address || "",
+			notes: customer.notes || "",
+			userId: customer.userId || user?.id || "",
+			longitude: customer.location?.[0] ?? null,
+			latitude: customer.location?.[1] ?? null,
+			status: customer.status || "pending",
+		});
+		setShowAddModal(true);
+	};
 
-const handleLocationPickerOpen = (customer: Customer) => {
-	setLocationPickerCustomer(customer);
-	// Pre-fill picked location if customer already has coordinates
-	if (customer.location?.[0] && customer.location?.[1]) {
+	const handleLocationPickerOpen = (customer: Customer) => {
+		setLocationPickerCustomer(customer);
+		// Pre-fill picked location if customer already has coordinates
+		if (customer.location?.[0] && customer.location?.[1]) {
+			setPickedLocation({
+				longitude: customer.location[0],
+				latitude: customer.location[1],
+			});
+		} else {
+			setPickedLocation(null);
+		}
+		setShowLocationPicker(true);
+	};
+
+	const handleLocationPickerConfirm = async () => {
+		if (!pickedLocation || !locationPickerCustomer) return;
+
+		try {
+			await updateCustomer(locationPickerCustomer.id, {
+				...formData,
+				id: locationPickerCustomer.id,
+				longitude: pickedLocation.longitude,
+				latitude: pickedLocation.latitude,
+			});
+			setShowLocationPicker(false);
+			setLocationPickerCustomer(null);
+			setPickedLocation(null);
+		} catch (error: any) {
+			Alert.alert("Error", error.message || "Failed to update location");
+		}
+	};
+
+	const handleMapPress = (event: any) => {
+		const coordinate = event.nativeEvent.coordinate;
 		setPickedLocation({
-			longitude: customer.location[0],
-			latitude: customer.location[1],
+			latitude: coordinate.latitude,
+			longitude: coordinate.longitude,
 		});
-	} else {
-		setPickedLocation(null);
-	}
-	setShowLocationPicker(true);
-};
-
-const handleLocationPickerConfirm = async () => {
-	if (!pickedLocation || !locationPickerCustomer) return;
-
-	try {
-		await updateCustomer(locationPickerCustomer.id, {
-			...formData,
-			id: locationPickerCustomer.id,
-			longitude: pickedLocation.longitude,
-			latitude: pickedLocation.latitude,
-		});
-		setShowLocationPicker(false);
-		setLocationPickerCustomer(null);
-		setPickedLocation(null);
-	} catch (error: any) {
-		Alert.alert("Error", error.message || "Failed to update location");
-	}
-};
-
-const handleMapPress = (event: any) => {
-	const coordinate = event.nativeEvent.coordinate;
-	setPickedLocation({
-		latitude: coordinate.latitude,
-		longitude: coordinate.longitude,
-	});
-};
+	};
 
 	const handleDelete = (customerId: string) => {
 		Alert.alert(
@@ -235,7 +246,8 @@ const handleMapPress = (event: any) => {
 			)}
 			{item.location && (
 				<Text style={styles.customerLocation}>
-					📍 {item.location[1]?.toFixed(4)}, {item.location[0]?.toFixed(4)}
+					📍 {item.location[1]?.toFixed(4)},{" "}
+					{item.location[0]?.toFixed(4)}
 				</Text>
 			)}
 			<View style={styles.customerActions}>
@@ -249,7 +261,11 @@ const handleMapPress = (event: any) => {
 					onPress={() => handleLocationPickerOpen(item)}
 					style={styles.actionButton}
 				>
-					<Ionicons name="location-outline" size={18} color="#10B981" />
+					<Ionicons
+						name="location-outline"
+						size={18}
+						color="#10B981"
+					/>
 				</TouchableOpacity>
 				<TouchableOpacity
 					onPress={() => handleDelete(item.id)}
@@ -298,8 +314,15 @@ const handleMapPress = (event: any) => {
 			{customerError && (
 				<View style={styles.errorContainer}>
 					<Text style={styles.errorText}>{customerError}</Text>
-					<TouchableOpacity onPress={clearError} style={styles.errorDismiss}>
-						<Ionicons name="close-outline" size={18} color="#EF4444" />
+					<TouchableOpacity
+						onPress={clearError}
+						style={styles.errorDismiss}
+					>
+						<Ionicons
+							name="close-outline"
+							size={18}
+							color="#EF4444"
+						/>
 					</TouchableOpacity>
 				</View>
 			)}
@@ -461,17 +484,26 @@ const handleMapPress = (event: any) => {
 
 							{/* Location Picker - Map integration would go here */}
 							<View style={styles.formGroup}>
-								<Text style={styles.formLabel}>Location (Optional)</Text>
+								<Text style={styles.formLabel}>
+									Location (Optional)
+								</Text>
 								<View style={styles.locationInputs}>
 									<View style={styles.locationInputWrapper}>
-										<Text style={styles.locationInputLabel}>Longitude</Text>
+										<Text style={styles.locationInputLabel}>
+											Longitude
+										</Text>
 										<TextInput
 											style={styles.formInput}
-											value={formData.longitude?.toString() || ""}
+											value={
+												formData.longitude?.toString() ||
+												""
+											}
 											onChangeText={(text) =>
 												setFormData({
 													...formData,
-													longitude: text ? parseFloat(text) : null,
+													longitude: text
+														? parseFloat(text)
+														: null,
 												})
 											}
 											placeholder="-122.4194"
@@ -479,14 +511,21 @@ const handleMapPress = (event: any) => {
 										/>
 									</View>
 									<View style={styles.locationInputWrapper}>
-										<Text style={styles.locationInputLabel}>Latitude</Text>
+										<Text style={styles.locationInputLabel}>
+											Latitude
+										</Text>
 										<TextInput
 											style={styles.formInput}
-											value={formData.latitude?.toString() || ""}
+											value={
+												formData.latitude?.toString() ||
+												""
+											}
 											onChangeText={(text) =>
 												setFormData({
 													...formData,
-													latitude: text ? parseFloat(text) : null,
+													latitude: text
+														? parseFloat(text)
+														: null,
 												})
 											}
 											placeholder="37.7749"
@@ -495,7 +534,8 @@ const handleMapPress = (event: any) => {
 									</View>
 								</View>
 								<Text style={styles.locationHint}>
-									Tap to open map picker (requires react-native-maps)
+									Tap to open map picker (requires
+									react-native-maps)
 								</Text>
 							</View>
 						</ScrollView>
@@ -578,8 +618,8 @@ const handleMapPress = (event: any) => {
 								<MapView
 									style={styles.locationPickerMap}
 									region={{
-										latitude: pickedLocation?.latitude ?? 37.7749,
-										longitude: pickedLocation?.longitude ?? -122.4194,
+										latitude: 33.33,
+										longitude: 44.39,
 										latitudeDelta: 0.0922,
 										longitudeDelta: 0.0421,
 									}}
@@ -595,12 +635,25 @@ const handleMapPress = (event: any) => {
 										>
 											<Callout>
 												<View style={styles.callout}>
-													<Text style={styles.calloutTitle}>
+													<Text
+														style={
+															styles.calloutTitle
+														}
+													>
 														Selected Location
 													</Text>
-													<Text style={styles.calloutDetail}>
-														{pickedLocation.latitude.toFixed(6)},{" "}
-														{pickedLocation.longitude.toFixed(6)}
+													<Text
+														style={
+															styles.calloutDetail
+														}
+													>
+														{pickedLocation.latitude.toFixed(
+															6,
+														)}
+														,{" "}
+														{pickedLocation.longitude.toFixed(
+															6,
+														)}
 													</Text>
 												</View>
 											</Callout>
@@ -610,15 +663,23 @@ const handleMapPress = (event: any) => {
 							</View>
 							<View style={styles.locationPickerInfo}>
 								<Text style={styles.locationPickerInstruction}>
-									Tap on the map to select the customer location.
-									{pickedLocation ? " Drag marker to adjust." : ""}
+									Tap on the map to select the customer
+									location.
+									{pickedLocation
+										? " Drag marker to adjust."
+										: ""}
 								</Text>
 								{pickedLocation && (
 									<View style={styles.pickedCoords}>
-										<Text style={styles.pickedCoordsLabel}>Coordinates:</Text>
+										<Text style={styles.pickedCoordsLabel}>
+											Coordinates:
+										</Text>
 										<Text style={styles.pickedCoordsValue}>
-											{pickedLocation.latitude.toFixed(6)},{" "}
-											{pickedLocation.longitude.toFixed(6)}
+											{pickedLocation.latitude.toFixed(6)}
+											,{" "}
+											{pickedLocation.longitude.toFixed(
+												6,
+											)}
 										</Text>
 									</View>
 								)}
@@ -641,7 +702,8 @@ const handleMapPress = (event: any) => {
 								onPress={handleLocationPickerConfirm}
 								style={[
 									styles.saveButton,
-									!pickedLocation && styles.saveButtonDisabled,
+									!pickedLocation &&
+										styles.saveButtonDisabled,
 								]}
 								disabled={!pickedLocation}
 							>
@@ -657,7 +719,7 @@ const handleMapPress = (event: any) => {
 			</Modal>
 		</View>
 	);
-	}
+}
 
 const styles = StyleSheet.create({
 	container: {

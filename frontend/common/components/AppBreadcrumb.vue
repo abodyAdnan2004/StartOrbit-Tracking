@@ -21,12 +21,12 @@ const items = computed<BreadcrumbItem[]>(() => {
 <template>
   <div class="flex items-center gap-2 font-bold text-muted-600">
     <template v-for="(item, index) in items">
-      <span class="font-semibold"
-        ><Icon :name="item.icon" class="text-white" /> {{ item.label }}</span
-      >
+      <span class="font-semibold">
+        <Icon v-if="item.icon" :name="item.icon" class="text-white" /> {{ item.label }}
+      </span>
       <template v-if="index != items.length - 1">
         <slot v-if="hasSlot('separator')" name="separator" />
-        <Icon v-else :name="props.sepratorIcon" class="text-white" />
+        <Icon v-else-if="props.sepratorIcon" :name="props.sepratorIcon" class="text-white" />
       </template>
     </template>
   </div>

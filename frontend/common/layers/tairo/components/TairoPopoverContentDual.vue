@@ -81,6 +81,9 @@ const props = defineProps<{
           >
             <Icon :name="stat.icon" class="size-4" />
           </BaseIconBox>
+          <template v-else-if="!stat.icon && !stat.image">
+            <div class="me-2" />
+          </template>
           <BaseAvatar v-if="stat.image && !stat.icon" :src="stat.image" size="xs" class="me-2" />
           <div>
             <BaseHeading

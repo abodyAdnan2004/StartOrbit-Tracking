@@ -82,7 +82,7 @@ function onDropClick() {
           exact-active-class="!border-primary-500 !text-primary-400"
           class="nui-focus relative -start-0.5 flex cursor-pointer items-center gap-2 border-s-2 border-transparent py-2 ps-4 text-muted-400 transition-colors duration-300 hover:text-muted-200"
         >
-          <Icon :name="child.icon.name" :class="child.icon.class" class="shrink-0" />
+          <Icon v-if="child.icon?.name" :name="child.icon.name" :class="child.icon.class" class="shrink-0" />
           <span
             class="whitespace-nowrap font-sans text-[0.85rem]"
             :class="[!props.expanded ? 'hidden' : 'block']"

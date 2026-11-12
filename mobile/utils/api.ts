@@ -4,49 +4,7 @@ import axios, {
 	InternalAxiosRequestConfig,
 } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Constants from "expo-constants";
-
-// Get the API base URL from Expo config or environment
-// For mobile devices, we need to use the machine's IP, not localhost
-const getApiBaseUrl = (): string => {
-	// First check environment variable
-	if (process.env.EXPO_PUBLIC_API_URL) {
-		console.log(
-			"process.env.EXPO_PUBLIC_API_URL",
-			process.env.EXPO_PUBLIC_API_URL,
-		);
-		return process.env.EXPO_PUBLIC_API_URL;
-	}
-
-	// Try to get from Expo config (extra.apiUrl)
-	const extraApiUrl = Constants.expoConfig?.extra?.apiUrl;
-	if (extraApiUrl) {
-		console.log("extraApiUrl", extraApiUrl);
-		return extraApiUrl;
-	}
-
-	// For Expo development, try to detect the host from the manifest URL
-	// This works when running on physical device via Expo Go
-	if (Constants.manifest2?.extra?.apiUrl) {
-		console.log(
-			"Constants.manifest2.extra.apiUrl",
-			Constants.manifest2.extra.apiUrl,
-		);
-		return Constants.manifest2.extra.apiUrl;
-	}
-
-	// Fallback: try to construct from the debugger host
-	// This works for iOS simulator and Android emulator
-	if (__DEV__ && Constants.manifest?.debuggerHost) {
-		const host = Constants.manifest.debuggerHost.split(":")[0];
-		return `http://${host}:3000/api`;
-	}
-
-	// Default fallback
-	return "http://localhost:3000/api";
-};
-
-const API_BASE_URL = getApiBaseUrl();
+import { API_BASE_URL } from './apiConfig';
 
 // Type for the auth store getter - avoids circular dependency
 type AuthStoreGetter = () => {

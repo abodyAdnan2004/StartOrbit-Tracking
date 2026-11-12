@@ -69,10 +69,10 @@ export const useAuthStore = defineStore('auth-store', () => {
         userData.value = response.user
         navigateTo('/')
       } else {
-        throw new Error(response.message || 'Login failed')
+        console.log(response.message || 'Login failed')
       }
     } catch (error) {
-      throw error
+      console.log( error)
     } finally {
       isLoading.value = false
     }

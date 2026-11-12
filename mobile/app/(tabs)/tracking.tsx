@@ -8,7 +8,7 @@ import {
 	Platform,
 	TouchableOpacity,
 } from "react-native";
-import MapView, { Marker, Callout } from "react-native-maps";
+import MapView, { Marker, Callout, Circle } from "react-native-maps";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { useAuthStore } from "@/store/authStore";
@@ -32,13 +32,16 @@ export default function TrackingScreen() {
 		latitudeDelta: 0.0922,
 		longitudeDelta: 0.0421,
 	});
-	const [permissionStatus, setPermissionStatus] = useState<Location.PermissionStatus | null>(null);
+	const [permissionStatus, setPermissionStatus] =
+		useState<Location.PermissionStatus | null>(null);
 	const mapRef = useRef<MapView>(null);
 
 	// Auto-start tracking when screen mounts
 	useEffect(() => {
 		if (token) {
 			checkPermissionsAndStart();
+			// Also get current position for initial map region
+			getCurrentPositionForMap();
 		}
 		return () => {
 			// Cleanup on unmount
@@ -50,12 +53,40 @@ export default function TrackingScreen() {
 	const checkPermissionsAndStart = async () => {
 		const { status } = await Location.getForegroundPermissionsAsync();
 		setPermissionStatus(status);
+
+		let finalStatus = status;
 		if (status !== "granted") {
-			const { status: newStatus } = await Location.requestForegroundPermissionsAsync();
+			const { status: newStatus } =
+				await Location.requestForegroundPermissionsAsync();
 			setPermissionStatus(newStatus);
+			finalStatus = newStatus;
 		}
-		if (permissionStatus === "granted" || status === "granted") {
+
+		if (finalStatus === "granted") {
 			startTracking(token!);
+		} else {
+			clearError();
+		}
+	};
+
+	// Get current position for initial map region (Phase 3 enhancement)
+	const getCurrentPositionForMap = async () => {
+		try {
+			const { status } = await Location.getForegroundPermissionsAsync();
+			if (status === "granted") {
+				const currentPos = await Location.getCurrentPositionAsync({
+					accuracy: Location.Accuracy.High,
+				});
+				setMapRegion({
+					latitude: currentPos.coords.latitude,
+					longitude: currentPos.coords.longitude,
+					latitudeDelta: 0.0922,
+					longitudeDelta: 0.0421,
+				});
+			}
+		} catch (error) {
+			console.log("Could not get initial position for map:", error);
+			// Keep default region (San Francisco) as fallback
 		}
 	};
 
@@ -82,14 +113,22 @@ export default function TrackingScreen() {
 			{/* Header */}
 			<View style={styles.header}>
 				<View style={styles.headerLeft}>
-					<Ionicons name="compass-outline" size={24} color="#3B82F6" />
+					<Ionicons
+						name="compass-outline"
+						size={24}
+						color="#3B82F6"
+					/>
 					<Text style={styles.headerTitle}>Live Location</Text>
 				</View>
 				<View style={styles.headerRight}>
-					<View style={[
-						styles.connectionDot,
-						isConnected ? styles.connectionDotConnected : styles.connectionDotDisconnected
-					]} />
+					<View
+						style={[
+							styles.connectionDot,
+							isConnected
+								? styles.connectionDotConnected
+								: styles.connectionDotDisconnected,
+						]}
+					/>
 					<Text style={styles.connectionText}>
 						{isConnected ? "Live" : "Offline"}
 					</Text>
@@ -117,18 +156,23 @@ export default function TrackingScreen() {
 					>
 						<Callout>
 							<View style={styles.callout}>
-								<Text style={styles.calloutTitle}>Current Position</Text>
+								<Text style={styles.calloutTitle}>
+									Current Position
+								</Text>
 								<Text style={styles.calloutDetail}>
 									{currentLocation.latitude.toFixed(6)},{" "}
 									{currentLocation.longitude.toFixed(6)}
 								</Text>
 								<Text style={styles.calloutDetail}>
 									Accuracy:{" "}
-									{currentLocation.accuracy?.toFixed(1) || "N/A"}m
+									{currentLocation.accuracy?.toFixed(1) ||
+										"N/A"}
+									m
 								</Text>
 								{currentLocation.speed && (
 									<Text style={styles.calloutDetail}>
-										Speed: {currentLocation.speed.toFixed(1)} m/s
+										Speed:{" "}
+										{currentLocation.speed.toFixed(1)} m/s
 									</Text>
 								)}
 							</View>
@@ -138,7 +182,7 @@ export default function TrackingScreen() {
 
 				{/* Accuracy Circle */}
 				{currentLocation && currentLocation.accuracy && (
-					<MapView.Circle
+					<Circle
 						center={{
 							latitude: currentLocation.latitude,
 							longitude: currentLocation.longitude,
@@ -171,20 +215,34 @@ export default function TrackingScreen() {
 					<View style={styles.infoRow}>
 						<View style={styles.infoItem}>
 							<Text style={styles.infoLabel}>Accuracy</Text>
-							<Text style={[
-								styles.infoValue,
-								{
-									color: currentLocation.accuracy && currentLocation.accuracy <= 10 ? "#10B981" :
-										 currentLocation.accuracy && currentLocation.accuracy <= 30 ? "#F59E0B" : "#EF4444",
-								},
-							]}>
-								{currentLocation.accuracy ? currentLocation.accuracy.toFixed(1) : "N/A"}m
+							<Text
+								style={[
+									styles.infoValue,
+									{
+										color:
+											currentLocation.accuracy &&
+											currentLocation.accuracy <= 10
+												? "#10B981"
+												: currentLocation.accuracy &&
+													  currentLocation.accuracy <=
+															30
+													? "#F59E0B"
+													: "#EF4444",
+									},
+								]}
+							>
+								{currentLocation.accuracy
+									? currentLocation.accuracy.toFixed(1)
+									: "N/A"}
+								m
 							</Text>
 						</View>
 						<View style={styles.infoItem}>
 							<Text style={styles.infoLabel}>Speed</Text>
 							<Text style={styles.infoValue}>
-								{currentLocation.speed ? currentLocation.speed.toFixed(1) + " m/s" : "N/A"}
+								{currentLocation.speed
+									? currentLocation.speed.toFixed(1) + " m/s"
+									: "N/A"}
 							</Text>
 						</View>
 					</View>
@@ -193,10 +251,22 @@ export default function TrackingScreen() {
 
 			{error && (
 				<View style={styles.errorBanner}>
-					<Ionicons name="alert-circle-outline" size={18} color="#EF4444" style={{ marginRight: 8 }} />
+					<Ionicons
+						name="alert-circle-outline"
+						size={18}
+						color="#EF4444"
+						style={{ marginRight: 8 }}
+					/>
 					<Text style={styles.errorText}>{error}</Text>
-					<TouchableOpacity onPress={clearError} style={styles.errorDismiss}>
-						<Ionicons name="close-outline" size={18} color="#EF4444" />
+					<TouchableOpacity
+						onPress={clearError}
+						style={styles.errorDismiss}
+					>
+						<Ionicons
+							name="close-outline"
+							size={18}
+							color="#EF4444"
+						/>
 					</TouchableOpacity>
 				</View>
 			)}
@@ -206,6 +276,7 @@ export default function TrackingScreen() {
 
 const styles = StyleSheet.create({
 	container: {
+		marginTop: 50,
 		flex: 1,
 		backgroundColor: "#F9FAFB",
 	},
