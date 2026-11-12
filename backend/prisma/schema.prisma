@@ -8,12 +8,11 @@ generator client {
 
 datasource db {
   provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
-// User model - matches frontend AuthResponse User structure
 model User {
   id            String    @id @default(uuid())
-  employeeId    Int       @unique
   username      String    @unique
   email         String    @unique
   passwordHash  String
@@ -22,9 +21,8 @@ model User {
   fullName      String
   phoneNumber   String?
   isActive      Boolean   @default(true)
-  role          String    @default("user")  // Simple role: 'admin' or 'user'
+  role          String    @default("user")  // 'admin' | 'user' | 'viewer'
   customers     Customer[]
-  locations     Location[]
   refreshTokens RefreshToken[] @relation("UserRefreshTokens")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -32,46 +30,28 @@ model User {
   @@map("users")
 }
 
-// Customer model - assigned to users
+// Customer model - UPDATED per spec
 model Customer {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  email       String?
-  phone       String?
-  address     String?
-  notes       String?
-  isActive    Boolean  @default(true)
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  locations   Location[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String            @id @default(uuid())
+  name              String            @unique
+  email             String?
+  phone             String?
+  address           String?
+  notes             String?
+  status            String            @default("pending")  // 'pending' | 'approved' | 'cancelled'
+  statusTimestamps  String?           // JSON string: { pending: timestamp, approved?: timestamp, cancelled?: timestamp }
+  longitude         Float?
+  latitude          Float?
+  isActive          Boolean           @default(true)
+  userId            String
+  user              User              @relation(fields: [userId], references: [id])
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 
   @@map("customers")
 }
 
-// Location model - real-time tracking data from mobile app
-model Location {
-  id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  customerId  String?
-  customer    Customer? @relation(fields: [customerId], references: [id])
-  latitude    Float
-  longitude   Float
-  altitude    Float?
-  accuracy    Float?
-  speed       Float?
-  heading     Float?
-  timestamp   DateTime @default(now())
-  metadata    String? // JSON stringified for SQLite compatibility
-
-  @@map("locations")
-  @@index([userId, timestamp])
-  @@index([customerId, timestamp])
-}
-
-// RefreshToken model for JWT refresh token rotation
+// RefreshToken model - UNCHANGED
 model RefreshToken {
   id        String   @id @default(uuid())
   token     String   @unique

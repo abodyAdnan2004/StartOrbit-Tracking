@@ -11,7 +11,6 @@ import { PrismaClient } from "@prisma/client";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
 import customerRoutes from "./routes/customers.js";
-import locationRoutes from "./routes/locations.js";
 import reportsRoutes from "./routes/reports.js";
 import { setupSocketHandlers } from "./socket/handlers.js";
 import { errorHandler } from "./middleware/errorHandler.js";
@@ -110,7 +109,6 @@ app.get("/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", authMiddleware, userRoutes);
 app.use("/api/customers", authMiddleware, customerRoutes);
-app.use("/api/locations", authMiddleware, locationRoutes);
 app.use("/api/reports", authMiddleware, reportsRoutes);
 
 // Socket.io connection handling

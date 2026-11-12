@@ -26,14 +26,13 @@ export const authMiddleware = async (req, res, next) => {
     // Attach user to request
     req.user = {
       id: user.id,
-      employeeId: user.employeeId,
       username: user.username,
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
       fullName: user.fullName,
       phoneNumber: user.phoneNumber,
-      role: user.role, // Now just a string: 'admin' or 'user'
+      role: user.role, // 'admin' | 'user' | 'viewer'
     };
 
     next();
@@ -68,14 +67,13 @@ export const optionalAuth = async (req, res, next) => {
     if (user && user.isActive) {
       req.user = {
         id: user.id,
-        employeeId: user.employeeId,
         username: user.username,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
         fullName: user.fullName,
         phoneNumber: user.phoneNumber,
-        role: user.role, // Now just a string: 'admin' or 'user'
+        role: user.role, // 'admin' | 'user' | 'viewer'
       };
     }
 
@@ -100,3 +98,9 @@ export const requireRole = (...roles) => {
     next();
   };
 };
+
+// Role helpers
+export const requireAdmin = requireRole('admin');
+export const requireAdminOrViewer = requireRole('admin', 'viewer');
+export const requireMobileAccess = requireRole('user');  // Only 'user' role
+export const requireDashboardAccess = requireRole('admin', 'viewer');

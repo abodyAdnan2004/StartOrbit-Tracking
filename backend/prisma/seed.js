@@ -13,246 +13,87 @@ async function main() {
   // Hash password for test users
   const defaultPassword = await bcrypt.hash('password123', 12);
 
-  // Create admin user
+  // Clean slate
+  console.log('Cleaning database...');
+  await prisma.refreshToken.deleteMany();
+  await prisma.customer.deleteMany();
+  await prisma.user.deleteMany();
+
+  // Create roles
   console.log('Creating admin user...');
-  const admin = await prisma.user.upsert({
-    where: { username: 'admin' },
-    update: {},
-    create: {
-      employeeId: 1000,
+  const admin = await prisma.user.create({
+    data: {
       username: 'admin',
-      email: 'admin@orbit-tracking.com',
-      passwordHash: defaultPassword,
+      email: 'admin@orbit.com',
+      passwordHash: await bcrypt.hash('admin123', 12),
       firstName: 'Admin',
       lastName: 'User',
       fullName: 'Admin User',
-      phoneNumber: '+1234567890',
       role: 'admin',
       isActive: true,
-    },
+    }
   });
   console.log('✅ Admin user created');
 
-  // Create field users
+  console.log('Creating viewer user...');
+  const viewer = await prisma.user.create({
+    data: {
+      username: 'viewer',
+      email: 'viewer@orbit.com',
+      passwordHash: await bcrypt.hash('viewer123', 12),
+      firstName: 'Viewer',
+      lastName: 'User',
+      fullName: 'Viewer User',
+      role: 'viewer',
+      isActive: true,
+    }
+  });
+  console.log('✅ Viewer user created');
+
   console.log('Creating field users...');
-  const fieldUsers = await Promise.all([
-    prisma.user.upsert({
-      where: { username: 'john_doe' },
-      update: {},
-      create: {
-        employeeId: 2001,
-        username: 'john_doe',
-        email: 'john.doe@orbit-tracking.com',
-        passwordHash: defaultPassword,
-        firstName: 'John',
-        lastName: 'Doe',
-        fullName: 'John Doe',
-        phoneNumber: '+1234567892',
-        role: 'user',
-        isActive: true,
-      },
-    }),
-    prisma.user.upsert({
-      where: { username: 'jane_smith' },
-      update: {},
-      create: {
-        employeeId: 2002,
-        username: 'jane_smith',
-        email: 'jane.smith@orbit-tracking.com',
-        passwordHash: defaultPassword,
-        firstName: 'Jane',
-        lastName: 'Smith',
-        fullName: 'Jane Smith',
-        phoneNumber: '+1234567893',
-        role: 'user',
-        isActive: true,
-      },
-    }),
-    prisma.user.upsert({
-      where: { username: 'mike_wilson' },
-      update: {},
-      create: {
-        employeeId: 2003,
-        username: 'mike_wilson',
-        email: 'mike.wilson@orbit-tracking.com',
-        passwordHash: defaultPassword,
-        firstName: 'Mike',
-        lastName: 'Wilson',
-        fullName: 'Mike Wilson',
-        phoneNumber: '+1234567894',
-        role: 'user',
-        isActive: true,
-      },
-    }),
-    prisma.user.upsert({
-      where: { username: 'sarah_jones' },
-      update: {},
-      create: {
-        employeeId: 2004,
-        username: 'sarah_jones',
-        email: 'sarah.jones@orbit-tracking.com',
-        passwordHash: defaultPassword,
-        firstName: 'Sarah',
-        lastName: 'Jones',
-        fullName: 'Sarah Jones',
-        phoneNumber: '+1234567895',
-        role: 'user',
-        isActive: true,
-      },
-    }),
-  ]);
+  const user1 = await prisma.user.create({
+    data: {
+      username: 'john_doe',
+      email: 'john.doe@orbit-tracking.com',
+      passwordHash: defaultPassword,
+      firstName: 'John',
+      lastName: 'Doe',
+      fullName: 'John Doe',
+      role: 'user',
+      isActive: true,
+    }
+  });
   console.log('✅ Field users created');
 
-  // Create customers assigned to field users
-  console.log('Creating customers...');
-  const customers = await Promise.all([
-    // John's customers
-    prisma.customer.upsert({
-      where: { name: 'Acme Corporation' },
-      update: {},
-      create: {
-        name: 'Acme Corporation',
-        email: 'contact@acme.com',
-        phone: '+15551234567',
-        address: '123 Business Ave, New York, NY 10001',
-        notes: 'Key account - monthly visits required',
-        userId: fieldUsers[0].id,
-        isActive: true,
+  // Sample customers
+  console.log('Creating sample customers...');
+  await prisma.customer.createMany({
+    data: [
+      {
+        name: 'Customer A',
+        email: 'a@test.com',
+        phone: '123',
+        userId: user1.id,
+        status: 'pending',
+        statusTimestamps: JSON.stringify({ pending: new Date().toISOString() })
       },
-    }),
-    prisma.customer.upsert({
-      where: { name: 'Globex Industries' },
-      update: {},
-      create: {
-        name: 'Globex Industries',
-        email: 'info@globex.com',
-        phone: '+15552345678',
-        address: '456 Industrial Blvd, Brooklyn, NY 11201',
-        notes: 'New prospect - schedule demo',
-        userId: fieldUsers[0].id,
-        isActive: true,
+      {
+        name: 'Customer B',
+        email: 'b@test.com',
+        phone: '456',
+        userId: user1.id,
+        status: 'approved',
+        statusTimestamps: JSON.stringify({ pending: new Date().toISOString(), approved: new Date().toISOString() })
       },
-    }),
-    prisma.customer.upsert({
-      where: { name: 'Wayne Enterprises' },
-      update: {},
-      create: {
-        name: 'Wayne Enterprises',
-        email: 'bruce@wayne.com',
-        phone: '+15553456789',
-        address: '789 Gotham Dr, Manhattan, NY 10007',
-        notes: 'VIP client - priority support',
-        userId: fieldUsers[0].id,
-        isActive: true,
-      },
-    }),
-
-    // Jane's customers
-    prisma.customer.upsert({
-      where: { name: 'Stark Industries' },
-      update: {},
-      create: {
-        name: 'Stark Industries',
-        email: 'pepper@stark.com',
-        phone: '+15554567890',
-        address: '100 Stark Tower, New York, NY 10108',
-        notes: 'Tech partner - quarterly reviews',
-        userId: fieldUsers[1].id,
-        isActive: true,
-      },
-    }),
-    prisma.customer.upsert({
-      where: { name: 'Oscorp' },
-      update: {},
-      create: {
-        name: 'Oscorp',
-        email: 'norman@oscorp.com',
-        phone: '+15555678901',
-        address: '200 Oscorp Plaza, Queens, NY 11368',
-        notes: 'Research collaboration',
-        userId: fieldUsers[1].id,
-        isActive: true,
-      },
-    }),
-
-    // Mike's customers
-    prisma.customer.upsert({
-      where: { name: 'Daily Bugle' },
-      update: {},
-      create: {
-        name: 'Daily Bugle',
-        email: 'jonah@bugle.com',
-        phone: '+15556789012',
-        address: '300 Press St, Manhattan, NY 10038',
-        notes: 'Media partner - weekly deliveries',
-        userId: fieldUsers[2].id,
-        isActive: true,
-      },
-    }),
-    prisma.customer.upsert({
-      where: { name: 'Roxxon Energy' },
-      update: {},
-      create: {
-        name: 'Roxxon Energy',
-        email: 'contact@roxxon.com',
-        phone: '+15557890123',
-        address: '400 Energy Ave, Bronx, NY 10451',
-        notes: 'Energy sector client',
-        userId: fieldUsers[2].id,
-        isActive: true,
-      },
-    }),
-
-    // Sarah's customers
-    prisma.customer.upsert({
-      where: { name: 'Pym Technologies' },
-      update: {},
-      create: {
-        name: 'Pym Technologies',
-        email: 'hank@pym.com',
-        phone: '+15558901234',
-        address: '500 Quantum Rd, Brooklyn, NY 11215',
-        notes: 'R&D partner',
-        userId: fieldUsers[3].id,
-        isActive: true,
-      },
-    }),
-    prisma.customer.upsert({
-      where: { name: 'Hammer Industries' },
-      update: {},
-      create: {
-        name: 'Hammer Industries',
-        email: 'justin@hammer.com',
-        phone: '+15559012345',
-        address: '600 Industrial Pkwy, Staten Island, NY 10301',
-        notes: 'Manufacturing client',
-        userId: fieldUsers[3].id,
-        isActive: true,
-      },
-    }),
-    prisma.customer.upsert({
-      where: { name: 'Rand Enterprises' },
-      update: {},
-      create: {
-        name: 'Rand Enterprises',
-        email: 'danny@rand.com',
-        phone: '+15550123456',
-        address: '700 Rand Bldg, Manhattan, NY 10013',
-        notes: 'New account - onboarding phase',
-        userId: fieldUsers[3].id,
-        isActive: true,
-      },
-    }),
-  ]);
+    ]
+  });
   console.log('✅ Customers created');
 
   console.log('\n🎉 Seed completed successfully!');
   console.log('\n📋 Test Credentials:');
-  console.log('Admin:    admin / password123');
+  console.log('Admin:    admin / admin123');
+  console.log('Viewer:   viewer / viewer123');
   console.log('Field:    john_doe / password123');
-  console.log('Field:    jane_smith / password123');
-  console.log('Field:    mike_wilson / password123');
-  console.log('Field:    sarah_jones / password123');
 }
 
 main()

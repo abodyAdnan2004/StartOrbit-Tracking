@@ -18,6 +18,7 @@ import {
 	ValidationError,
 	UnauthorizedError,
 	ConflictError,
+	ForbiddenError,
 } from "../middleware/errorHandler.js";
 
 const router = express.Router();
@@ -46,6 +47,17 @@ router.post("/login", async (req, res, next) => {
 		const isValid = await verifyPassword(data.password, user.passwordHash);
 		if (!isValid) {
 			throw new UnauthorizedError("Invalid credentials");
+		}
+
+		// Check if admin trying to access mobile app
+		const userAgent = req.headers["user-agent"] || "";
+		const isMobileApp =
+			userAgent.includes("Expo") ||
+			userAgent.includes("ReactNative") ||
+			req.body?.platform === "mobile";
+
+		if (isMobileApp && user.role === "admin") {
+			throw new ForbiddenError("Admins cannot access mobile app");
 		}
 
 		// Generate tokens
@@ -77,7 +89,6 @@ router.post("/login", async (req, res, next) => {
 			message: "Login successful",
 			errorCode: null,
 			user: {
-				employeeId: user.employeeId,
 				username: user.username,
 				email: user.email,
 				firstName: user.firstName,
@@ -103,35 +114,30 @@ router.post("/register", async (req, res, next) => {
 		// Check if user already exists
 		const existingUser = await prisma.user.findFirst({
 			where: {
-				OR: [
-					{ username: data.username },
-					{ email: data.email },
-					{ employeeId: data.employeeId },
-				],
+				OR: [{ username: data.username }, { email: data.email }],
 			},
 		});
 
 		if (existingUser) {
 			throw new ConflictError(
-				"User with this username, email, or employee ID already exists",
+				"User with this username or email already exists",
 			);
 		}
 
 		// Hash password
 		const passwordHash = await hashPassword(data.password);
 
-		// Validate role - only allow 'admin' or 'user'
+		// Validate role - allow 'admin', 'user', or 'viewer'
 		const role = data.role || "user";
-		if (!["admin", "user"].includes(role)) {
+		if (!["admin", "user", "viewer"].includes(role)) {
 			throw new ValidationError(
-				'Invalid role. Must be "admin" or "user"',
+				'Invalid role. Must be "admin", "user", or "viewer"',
 			);
 		}
 
 		// Create user
 		const user = await prisma.user.create({
 			data: {
-				employeeId: data.employeeId,
 				username: data.username,
 				email: data.email,
 				passwordHash,
@@ -148,7 +154,6 @@ router.post("/register", async (req, res, next) => {
 			message: "User created successfully",
 			errorCode: null,
 			user: {
-				employeeId: user.employeeId,
 				username: user.username,
 				email: user.email,
 				firstName: user.firstName,
@@ -187,7 +192,6 @@ router.get("/me", async (req, res, next) => {
 
 		res.json({
 			data: {
-				employeeId: user.employeeId,
 				username: user.username,
 				email: user.email,
 				firstName: user.firstName,
@@ -260,7 +264,6 @@ router.post("/refresh", async (req, res, next) => {
 			message: "Token refreshed",
 			errorCode: null,
 			user: {
-				employeeId: user.employeeId,
 				username: user.username,
 				email: user.email,
 				firstName: user.firstName,

@@ -15,9 +15,10 @@ import {
 	ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import MapView, { Marker, Callout } from "react-native-maps";
 import { useAuthStore } from "@/store/authStore";
 import { useCustomerStore } from "@/store/customerStore";
-import { Customer } from "@/types/customer";
+import { Customer, CustomerCreateRequest, CustomerUpdateRequest } from "@/types/customer";
 
 export default function CustomersScreen() {
 	const { token, user, isHydrated } = useAuthStore();
@@ -35,18 +36,24 @@ export default function CustomersScreen() {
 	} = useCustomerStore();
 	const [refreshing, setRefreshing] = useState(false);
 	const [showAddModal, setShowAddModal] = useState(false);
-	const [editingCustomer, setEditingCustomer] = useState<Customer | null>(
-		null,
-	);
-	const [formData, setFormData] = useState({
-		name: "",
-		email: "",
-		phone: "",
-		address: "",
-		notes: "",
-		userId: user?.id || "",
-	});
-	const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+const [editingCustomer, setEditingCustomer] = useState<Customer | null>(
+	null,
+);
+const [showLocationPicker, setShowLocationPicker] = useState(false);
+const [locationPickerCustomer, setLocationPickerCustomer] = useState<Customer | null>(null);
+const [pickedLocation, setPickedLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+const [formData, setFormData] = useState<CustomerCreateRequest>({
+	name: "",
+	email: "",
+	phone: "",
+	address: "",
+	notes: "",
+	userId: user?.id || "",
+	longitude: null,
+	latitude: null,
+	status: "pending",
+});
+const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
 	// Don't render until hydrated
 	if (!isHydrated) {
@@ -93,39 +100,91 @@ export default function CustomersScreen() {
 			address: "",
 			notes: "",
 			userId: user?.id || "",
+			longitude: null,
+			latitude: null,
+			status: "pending",
 		});
 		setFormErrors({});
 	};
 
 	const handleSubmit = async () => {
-		if (!validateForm()) return;
+	if (!validateForm()) return;
 
-		try {
-			if (editingCustomer) {
-				await updateCustomer(editingCustomer.id, formData);
-			} else {
-				await createCustomer(formData);
-			}
+	try {
+		if (editingCustomer) {
+			await updateCustomer(editingCustomer.id, formData);
 			setShowAddModal(false);
 			setEditingCustomer(null);
 			resetForm();
-		} catch (error: any) {
-			Alert.alert("Error", error.message || "Failed to save customer");
+		} else {
+			const newCustomer = await createCustomer(formData);
+			setShowAddModal(false);
+			setEditingCustomer(null);
+			resetForm();
+			// Open location picker for the new customer
+			setLocationPickerCustomer(newCustomer);
+			setShowLocationPicker(true);
 		}
-	};
+	} catch (error: any) {
+		Alert.alert("Error", error.message || "Failed to save customer");
+	}
+};
 
 	const handleEdit = (customer: Customer) => {
-		setEditingCustomer(customer);
-		setFormData({
-			name: customer.name,
-			email: customer.email || "",
-			phone: customer.phone || "",
-			address: customer.address || "",
-			notes: customer.notes || "",
-			userId: customer.userId || user?.id || "",
+	setEditingCustomer(customer);
+	setFormData({
+		name: customer.name,
+		email: customer.email || "",
+		phone: customer.phone || "",
+		address: customer.address || "",
+		notes: customer.notes || "",
+		userId: customer.userId || user?.id || "",
+		longitude: customer.location?.[0] ?? null,
+		latitude: customer.location?.[1] ?? null,
+		status: customer.status || "pending",
+	});
+	setShowAddModal(true);
+};
+
+const handleLocationPickerOpen = (customer: Customer) => {
+	setLocationPickerCustomer(customer);
+	// Pre-fill picked location if customer already has coordinates
+	if (customer.location?.[0] && customer.location?.[1]) {
+		setPickedLocation({
+			longitude: customer.location[0],
+			latitude: customer.location[1],
 		});
-		setShowAddModal(true);
-	};
+	} else {
+		setPickedLocation(null);
+	}
+	setShowLocationPicker(true);
+};
+
+const handleLocationPickerConfirm = async () => {
+	if (!pickedLocation || !locationPickerCustomer) return;
+
+	try {
+		await updateCustomer(locationPickerCustomer.id, {
+			...formData,
+			id: locationPickerCustomer.id,
+			longitude: pickedLocation.longitude,
+			latitude: pickedLocation.latitude,
+		});
+		setShowLocationPicker(false);
+		setLocationPickerCustomer(null);
+		setPickedLocation(null);
+	} catch (error: any) {
+		Alert.alert("Error", error.message || "Failed to update location");
+	}
+};
+
+const handleMapPress = (event: any) => {
+	const coordinate = event.nativeEvent.coordinate;
+	setPickedLocation({
+		latitude: coordinate.latitude,
+		longitude: coordinate.longitude,
+	});
+};
 
 	const handleDelete = (customerId: string) => {
 		Alert.alert(
@@ -174,12 +233,23 @@ export default function CustomersScreen() {
 			{item.address && (
 				<Text style={styles.customerAddress}>{item.address}</Text>
 			)}
+			{item.location && (
+				<Text style={styles.customerLocation}>
+					📍 {item.location[1]?.toFixed(4)}, {item.location[0]?.toFixed(4)}
+				</Text>
+			)}
 			<View style={styles.customerActions}>
 				<TouchableOpacity
 					onPress={() => handleEdit(item)}
 					style={styles.actionButton}
 				>
 					<Ionicons name="create-outline" size={18} color="#3B82F6" />
+				</TouchableOpacity>
+				<TouchableOpacity
+					onPress={() => handleLocationPickerOpen(item)}
+					style={styles.actionButton}
+				>
+					<Ionicons name="location-outline" size={18} color="#10B981" />
 				</TouchableOpacity>
 				<TouchableOpacity
 					onPress={() => handleDelete(item.id)}
@@ -388,6 +458,46 @@ export default function CustomersScreen() {
 									numberOfLines={3}
 								/>
 							</View>
+
+							{/* Location Picker - Map integration would go here */}
+							<View style={styles.formGroup}>
+								<Text style={styles.formLabel}>Location (Optional)</Text>
+								<View style={styles.locationInputs}>
+									<View style={styles.locationInputWrapper}>
+										<Text style={styles.locationInputLabel}>Longitude</Text>
+										<TextInput
+											style={styles.formInput}
+											value={formData.longitude?.toString() || ""}
+											onChangeText={(text) =>
+												setFormData({
+													...formData,
+													longitude: text ? parseFloat(text) : null,
+												})
+											}
+											placeholder="-122.4194"
+											keyboardType="decimal-pad"
+										/>
+									</View>
+									<View style={styles.locationInputWrapper}>
+										<Text style={styles.locationInputLabel}>Latitude</Text>
+										<TextInput
+											style={styles.formInput}
+											value={formData.latitude?.toString() || ""}
+											onChangeText={(text) =>
+												setFormData({
+													...formData,
+													latitude: text ? parseFloat(text) : null,
+												})
+											}
+											placeholder="37.7749"
+											keyboardType="decimal-pad"
+										/>
+									</View>
+								</View>
+								<Text style={styles.locationHint}>
+									Tap to open map picker (requires react-native-maps)
+								</Text>
+							</View>
 						</ScrollView>
 
 						<View style={styles.modalActions}>
@@ -423,9 +533,131 @@ export default function CustomersScreen() {
 					</View>
 				</KeyboardAvoidingView>
 			</Modal>
+
+			{/* Location Picker Modal */}
+			<Modal
+				visible={showLocationPicker}
+				animationType="slide"
+				transparent={true}
+			>
+				<View
+					style={styles.modalOverlay}
+					onTouchStart={() => {
+						setShowLocationPicker(false);
+						setLocationPickerCustomer(null);
+						setPickedLocation(null);
+					}}
+				>
+					<View
+						style={styles.modalContainer}
+						onTouchStart={(e) => e.stopPropagation()}
+					>
+						<View style={styles.modalHeader}>
+							<Text style={styles.modalTitle}>
+								{locationPickerCustomer
+									? `Set Location: ${locationPickerCustomer.name}`
+									: "Select Location"}
+							</Text>
+							<TouchableOpacity
+								onPress={() => {
+									setShowLocationPicker(false);
+									setLocationPickerCustomer(null);
+									setPickedLocation(null);
+								}}
+								style={styles.closeButton}
+							>
+								<Ionicons
+									name="close-outline"
+									size={24}
+									color="#6B7280"
+								/>
+							</TouchableOpacity>
+						</View>
+						<View style={styles.modalContent}>
+							<View style={styles.locationPickerMapContainer}>
+								<MapView
+									style={styles.locationPickerMap}
+									region={{
+										latitude: pickedLocation?.latitude ?? 37.7749,
+										longitude: pickedLocation?.longitude ?? -122.4194,
+										latitudeDelta: 0.0922,
+										longitudeDelta: 0.0421,
+									}}
+									onPress={handleMapPress}
+									showsUserLocation={true}
+									showsMyLocationButton={true}
+								>
+									{pickedLocation && (
+										<Marker
+											coordinate={pickedLocation}
+											title="Selected Location"
+											pinColor="#10B981"
+										>
+											<Callout>
+												<View style={styles.callout}>
+													<Text style={styles.calloutTitle}>
+														Selected Location
+													</Text>
+													<Text style={styles.calloutDetail}>
+														{pickedLocation.latitude.toFixed(6)},{" "}
+														{pickedLocation.longitude.toFixed(6)}
+													</Text>
+												</View>
+											</Callout>
+										</Marker>
+									)}
+								</MapView>
+							</View>
+							<View style={styles.locationPickerInfo}>
+								<Text style={styles.locationPickerInstruction}>
+									Tap on the map to select the customer location.
+									{pickedLocation ? " Drag marker to adjust." : ""}
+								</Text>
+								{pickedLocation && (
+									<View style={styles.pickedCoords}>
+										<Text style={styles.pickedCoordsLabel}>Coordinates:</Text>
+										<Text style={styles.pickedCoordsValue}>
+											{pickedLocation.latitude.toFixed(6)},{" "}
+											{pickedLocation.longitude.toFixed(6)}
+										</Text>
+									</View>
+								)}
+							</View>
+						</View>
+						<View style={styles.modalActions}>
+							<TouchableOpacity
+								onPress={() => {
+									setShowLocationPicker(false);
+									setLocationPickerCustomer(null);
+									setPickedLocation(null);
+								}}
+								style={styles.cancelButton}
+							>
+								<Text style={styles.cancelButtonText}>
+									Cancel
+								</Text>
+							</TouchableOpacity>
+							<TouchableOpacity
+								onPress={handleLocationPickerConfirm}
+								style={[
+									styles.saveButton,
+									!pickedLocation && styles.saveButtonDisabled,
+								]}
+								disabled={!pickedLocation}
+							>
+								<Text style={styles.saveButtonText}>
+									{locationPickerCustomer
+										? "Update Location"
+										: "Save Location"}
+								</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+				</View>
+			</Modal>
 		</View>
 	);
-}
+	}
 
 const styles = StyleSheet.create({
 	container: {
@@ -541,6 +773,11 @@ const styles = StyleSheet.create({
 	customerAddress: {
 		fontSize: 13,
 		color: "#6B7280",
+		marginTop: 2,
+	},
+	customerLocation: {
+		fontSize: 12,
+		color: "#3B82F6",
 		marginTop: 2,
 	},
 	customerActions: {
@@ -692,5 +929,77 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		backgroundColor: "#F9FAFB",
+	},
+	locationInputs: {
+		flexDirection: "row",
+		gap: 12,
+	},
+	locationInputWrapper: {
+		flex: 1,
+	},
+	locationInputLabel: {
+		fontSize: 12,
+		color: "#6B7280",
+		marginBottom: 4,
+	},
+	locationHint: {
+		fontSize: 12,
+		color: "#9CA3AF",
+		marginTop: 8,
+		fontStyle: "italic",
+	},
+	// Location Picker Modal Styles
+	locationPickerMapContainer: {
+		height: 300,
+		borderRadius: 12,
+		overflow: "hidden",
+		marginBottom: 16,
+	},
+	locationPickerMap: {
+		flex: 1,
+	},
+	locationPickerInfo: {
+		paddingHorizontal: 4,
+		paddingVertical: 8,
+	},
+	locationPickerInstruction: {
+		fontSize: 14,
+		color: "#6B7280",
+		marginBottom: 8,
+		textAlign: "center",
+	},
+	pickedCoords: {
+		backgroundColor: "#F9FAFB",
+		borderRadius: 8,
+		padding: 12,
+	},
+	pickedCoordsLabel: {
+		fontSize: 13,
+		fontWeight: "600",
+		color: "#374151",
+		marginBottom: 4,
+	},
+	pickedCoordsValue: {
+		fontSize: 13,
+		fontFamily: "monospace",
+		color: "#3B82F6",
+	},
+	saveButtonDisabled: {
+		opacity: 0.5,
+	},
+	callout: {
+		padding: 8,
+		minWidth: 200,
+	},
+	calloutTitle: {
+		fontSize: 14,
+		fontWeight: "700",
+		color: "#111827",
+		marginBottom: 4,
+	},
+	calloutDetail: {
+		fontSize: 12,
+		color: "#6B7280",
+		marginBottom: 2,
 	},
 });

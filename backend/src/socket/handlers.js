@@ -66,8 +66,8 @@ export const setupSocketHandlers = (socket, io) => {
 				`User authenticated: ${user.fullName} (${user.role}) - Socket: ${socket.id}`,
 			);
 
-			// Send current online users to admins/managers
-			if (["admin"].includes(user.role)) {
+			// Send current online users to admins/viewers
+			if (["admin", "viewer"].includes(user.role)) {
 				const onlineUsers = await getOnlineUsers();
 				socket.emit("users:online", onlineUsers);
 			}
@@ -117,22 +117,7 @@ export const setupSocketHandlers = (socket, io) => {
 				return;
 			}
 
-			// Save to database
-			const location = await prisma.location.create({
-				data: {
-					userId: socket.userId,
-					latitude,
-					longitude,
-					altitude,
-					accuracy,
-					speed,
-					heading,
-					customerId,
-					metadata,
-				},
-			});
-
-			// Broadcast to relevant rooms
+			// NO DATABASE SAVE - Real-time only
 			const locationData = {
 				userId: socket.userId,
 				userName: socket.userName,
@@ -142,7 +127,7 @@ export const setupSocketHandlers = (socket, io) => {
 				accuracy,
 				speed,
 				heading,
-				timestamp: location.timestamp,
+				timestamp: new Date().toISOString(),  // Current time
 				customerId,
 			};
 
@@ -152,19 +137,18 @@ export const setupSocketHandlers = (socket, io) => {
 				locationData,
 			);
 
-			// Broadcast to admin/manager rooms
+			// Broadcast to admin/viewer rooms
 			io.to("role:admin").emit("location:update", locationData);
-			io.to("role:manager").emit("location:update", locationData);
+			io.to("role:viewer").emit("location:update", locationData);  // ADD viewer
 
 			// Acknowledge receipt
 			socket.emit("location:ack", {
-				id: location.id,
-				timestamp: location.timestamp,
+				timestamp: locationData.timestamp,
 			});
 		} catch (error) {
 			console.error("Location update error:", error);
 			socket.emit("location:error", {
-				message: "Failed to save location",
+				message: "Failed to process location",
 			});
 		}
 	});
@@ -184,52 +168,31 @@ export const setupSocketHandlers = (socket, io) => {
 				return;
 			}
 
-			// Validate and save all locations
-			const createdLocations = await Promise.all(
-				locations.map((loc) => {
-					const {
-						latitude,
-						longitude,
-						altitude,
-						accuracy,
-						speed,
-						heading,
-						customerId,
-						metadata,
-						timestamp,
-					} = loc;
-					return prisma.location.create({
-						data: {
-							userId: socket.userId,
-							latitude,
-							longitude,
-							altitude,
-							accuracy,
-							speed,
-							heading,
-							customerId,
-							metadata,
-							timestamp: timestamp
-								? new Date(timestamp)
-								: new Date(),
-						},
-					});
-				}),
-			);
+			// Validate and broadcast latest location (NO DB SAVE)
+			const latest = locations[locations.length - 1];
+			const {
+				latitude,
+				longitude,
+				altitude,
+				accuracy,
+				speed,
+				heading,
+				customerId,
+				metadata,
+				timestamp,
+			} = latest;
 
-			// Broadcast latest location
-			const latest = createdLocations[createdLocations.length - 1];
 			const locationData = {
 				userId: socket.userId,
 				userName: socket.userName,
-				latitude: latest.latitude,
-				longitude: latest.longitude,
-				altitude: latest.altitude,
-				accuracy: latest.accuracy,
-				speed: latest.speed,
-				heading: latest.heading,
-				timestamp: latest.timestamp,
-				customerId: latest.customerId,
+				latitude,
+				longitude,
+				altitude,
+				accuracy,
+				speed,
+				heading,
+				timestamp: timestamp ? new Date(timestamp).toISOString() : new Date().toISOString(),
+				customerId,
 			};
 
 			io.to(`user:${socket.userId}`).emit(
@@ -237,16 +200,15 @@ export const setupSocketHandlers = (socket, io) => {
 				locationData,
 			);
 			io.to("role:admin").emit("location:update", locationData);
-			io.to("role:manager").emit("location:update", locationData);
+			io.to("role:viewer").emit("location:update", locationData);
 
 			socket.emit("location:batch:ack", {
-				count: createdLocations.length,
-				ids: createdLocations.map((l) => l.id),
+				count: locations.length,
 			});
 		} catch (error) {
 			console.error("Batch location error:", error);
 			socket.emit("location:error", {
-				message: "Failed to save batch locations",
+				message: "Failed to process batch locations",
 			});
 		}
 	});
@@ -255,9 +217,9 @@ export const setupSocketHandlers = (socket, io) => {
 	socket.on("subscribe:user", (targetUserId) => {
 		if (!socket.userId) return;
 
-		// Only allow admins/managers to subscribe to other users
+		// Only allow admins/viewers to subscribe to other users
 		if (
-			["admin"].includes(socket.userRole) ||
+			["admin", "viewer"].includes(socket.userRole) ||
 			socket.userId === targetUserId
 		) {
 			socket.join(`user:${targetUserId}`);
@@ -270,9 +232,9 @@ export const setupSocketHandlers = (socket, io) => {
 		socket.leave(`user:${targetUserId}`);
 	});
 
-	// Get online users (admin/manager only)
+	// Get online users (admin/viewer only)
 	socket.on("get:online-users", async () => {
-		if (!["admin"].includes(socket.userRole)) {
+		if (!["admin", "viewer"].includes(socket.userRole)) {
 			socket.emit("error", { message: "Not authorized" });
 			return;
 		}
@@ -299,9 +261,9 @@ export const setupSocketHandlers = (socket, io) => {
 				sockets.delete(socket.id);
 				if (sockets.size === 0) {
 					userSockets.delete(userId);
-					// Notify admins/managers user went offline
+					// Notify admins/viewers user went offline
 					io.to("role:admin").emit("user:offline", { userId });
-					io.to("role:manager").emit("user:offline", { userId });
+					io.to("role:viewer").emit("user:offline", { userId });
 				}
 			}
 		}
@@ -311,7 +273,7 @@ export const setupSocketHandlers = (socket, io) => {
 	});
 };
 
-// Helper to get online users with their latest location
+// Helper to get online users with their latest location (IN-MEMORY ONLY)
 async function getOnlineUsers() {
 	const onlineUserIds = Array.from(userSockets.keys());
 
@@ -319,43 +281,22 @@ async function getOnlineUsers() {
 
 	const users = await prisma.user.findMany({
 		where: { id: { in: onlineUserIds }, isActive: true },
-		include: { role: true },
 		select: {
 			id: true,
 			fullName: true,
 			username: true,
-			role: { select: { name: true } },
+			role: true,
 		},
 	});
 
-	// Get latest location for each online user
-	const latestLocations = await prisma.$queryRaw`
-    SELECT DISTINCT ON (l."userId")
-      l."userId", l.latitude, l.longitude, l.timestamp, l.accuracy
-    FROM "locations" l
-    WHERE l."userId" IN (${Prisma.join(onlineUserIds)})
-    ORDER BY l."userId", l.timestamp DESC
-  `;
-
-	const locationMap = new Map();
-	latestLocations.forEach((loc) => {
-		locationMap.set(loc.userId, {
-			latitude: loc.latitude,
-			longitude: loc.longitude,
-			timestamp: loc.timestamp,
-			accuracy: loc.accuracy,
-		});
-	});
-
-	return users.map((user) => ({
+	// NO location history query - Real-time only
+	// Location data will be received via real-time events
+	return users.map(user => ({
 		...user,
-		location: locationMap.get(user.id) || null,
+		location: null,  // Will be received via real-time events
 		isOnline: true,
 	}));
 }
-
-// Need to import Prisma for the join helper
-import { Prisma } from "@prisma/client";
 
 // Export helper functions for use in routes
 export const broadcastToUser = (io, userId, event, data) => {

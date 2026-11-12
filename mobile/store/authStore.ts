@@ -52,16 +52,17 @@ export const useAuthStore = create<AuthState>()(
 				try {
 					const apiClient = await getApi();
 					const response = (await apiClient.post("/auth/login", {
-						loginIdentifier: email,
+						loginIdentifier: email,  // email OR username
 						password,
 						rememberMe,
+						platform: 'mobile',  // Send platform hint
 					})) as { data: AuthResponse };
 					const { user, token } = response.data;
 
 					// Normalize backend 'roles' to frontend 'role'
 					const normalizedUser =
-						user.roles !== undefined
-							? { ...user, role: user.roles }
+						user.role !== undefined
+							? { ...user, role: user.role }
 							: user;
 
 					console.log(normalizedUser);
@@ -133,8 +134,8 @@ export const useAuthStore = create<AuthState>()(
 						// Normalize backend 'roles' to frontend 'role'
 						const userData = response.data.data;
 						const normalizedUser =
-							userData.roles !== undefined
-								? { ...userData, role: userData.roles }
+							userData.role !== undefined
+								? { ...userData, role: userData.role }
 								: userData;
 						set({ user: normalizedUser });
 					} catch (error) {
@@ -161,8 +162,8 @@ export const useAuthStore = create<AuthState>()(
 
 					// Normalize backend 'roles' to frontend 'role'
 					const normalizedUser =
-						user.roles !== undefined
-							? { ...user, role: user.roles }
+						user.role !== undefined
+							? { ...user, role: user.role }
 							: user;
 
 					set({

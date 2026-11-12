@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { api } from '@/utils/api';
-import { Customer } from '@/types/customer';
+import { Customer, CustomerCreateRequest, CustomerUpdateRequest, CustomerFilters } from '@/types/customer';
 
 interface CustomerState {
   customers: Customer[];
@@ -9,10 +9,11 @@ interface CustomerState {
   error: string | null;
 
   // Actions
-  loadCustomers: () => Promise<void>;
-  createCustomer: (data: Partial<Customer>) => Promise<Customer>;
-  updateCustomer: (id: string, data: Partial<Customer>) => Promise<Customer>;
+  loadCustomers: (filters?: CustomerFilters) => Promise<void>;
+  createCustomer: (data: CustomerCreateRequest) => Promise<Customer>;
+  updateCustomer: (id: string, data: CustomerUpdateRequest) => Promise<Customer>;
   deleteCustomer: (id: string) => Promise<void>;
+  exportCustomers: (filters?: CustomerFilters) => Promise<Blob>;
   setSearchQuery: (query: string) => void;
   clearError: () => void;
 }
@@ -23,17 +24,25 @@ export const useCustomerStore = create<CustomerState>((set, get) => ({
   searchQuery: '',
   error: null,
 
-  loadCustomers: async () => {
+  loadCustomers: async (filters?: CustomerFilters) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await api.get<{ items: Customer[] }>('/customers');
+      const params = new URLSearchParams();
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            params.append(key, String(value));
+          }
+        });
+      }
+      const response = await api.get<{ items: Customer[] }>(`/customers?${params.toString()}`);
       set({ customers: response.data.items, isLoading: false });
     } catch (error: any) {
       set({ error: error.message || 'Failed to load customers', isLoading: false });
     }
   },
 
-  createCustomer: async (data: Partial<Customer>) => {
+  createCustomer: async (data: CustomerCreateRequest) => {
     set({ isLoading: true, error: null });
     try {
       const response = await api.post<Customer>('/customers', data);
@@ -48,7 +57,7 @@ export const useCustomerStore = create<CustomerState>((set, get) => ({
     }
   },
 
-  updateCustomer: async (id: string, data: Partial<Customer>) => {
+  updateCustomer: async (id: string, data: CustomerUpdateRequest) => {
     set({ isLoading: true, error: null });
     try {
       const response = await api.put<Customer>(`/customers/${id}`, data);
@@ -73,6 +82,28 @@ export const useCustomerStore = create<CustomerState>((set, get) => ({
       }));
     } catch (error: any) {
       set({ error: error.message || 'Failed to delete customer', isLoading: false });
+      throw error;
+    }
+  },
+
+  exportCustomers: async (filters?: CustomerFilters) => {
+    set({ isLoading: true, error: null });
+    try {
+      const params = new URLSearchParams();
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            params.append(key, String(value));
+          }
+        });
+      }
+      const response = await api.get(`/customers/export?${params.toString()}`, {
+        responseType: 'blob',
+      });
+      set({ isLoading: false });
+      return response.data;
+    } catch (error: any) {
+      set({ error: error.message || 'Failed to export customers', isLoading: false });
       throw error;
     }
   },

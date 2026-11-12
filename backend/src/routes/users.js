@@ -5,6 +5,7 @@ import {
 	createUserSchema,
 	updateUserSchema,
 	userFiltersSchema,
+	customerFiltersSchema,
 } from "../utils/validation.js";
 import { requireRole } from "../middleware/auth.js";
 import { NotFoundError, ConflictError } from "../middleware/errorHandler.js";
@@ -20,10 +21,10 @@ router.get("/", requireRole("admin"), async (req, res, next) => {
 		const where = {};
 		if (search) {
 			where.OR = [
-				{ username: { contains: search, mode: "insensitive" } },
-				{ email: { contains: search, mode: "insensitive" } },
-				{ firstName: { contains: search, mode: "insensitive" } },
-				{ lastName: { contains: search, mode: "insensitive" } },
+				{ username: { contains: search } },
+				{ email: { contains: search } },
+				{ firstName: { contains: search } },
+				{ lastName: { contains: search } },
 			];
 		}
 		if (role) where.role = role;
@@ -43,14 +44,13 @@ router.get("/", requireRole("admin"), async (req, res, next) => {
 
 		res.json({
 			items: users.map((user) => ({
-				employeeId: user.employeeId,
 				username: user.username,
 				email: user.email,
 				firstName: user.firstName,
 				lastName: user.lastName,
 				fullName: user.fullName,
 				phoneNumber: user.phoneNumber || "",
-				roles: user.role,
+				role: user.role,
 				id: user.id,
 				isActive: user.isActive,
 			})),
@@ -88,14 +88,13 @@ router.get("/:id", requireRole("admin"), async (req, res, next) => {
 		}
 
 		res.json({
-			employeeId: user.employeeId,
 			username: user.username,
 			email: user.email,
 			firstName: user.firstName,
 			lastName: user.lastName,
 			fullName: user.fullName,
 			phoneNumber: user.phoneNumber || "",
-			roles: user.role,
+			role: user.role,
 			id: user.id,
 			isActive: user.isActive,
 		});
@@ -115,14 +114,13 @@ router.post("/", requireRole("admin"), async (req, res, next) => {
 				OR: [
 					{ username: data.username },
 					{ email: data.email },
-					{ employeeId: data.employeeId },
 				],
 			},
 		});
 
 		if (existingUser) {
 			throw new ConflictError(
-				"User with this username, email, or employee ID already exists",
+				"User with this username or email already exists",
 			);
 		}
 
@@ -132,7 +130,6 @@ router.post("/", requireRole("admin"), async (req, res, next) => {
 		// Create user
 		const user = await prisma.user.create({
 			data: {
-				employeeId: data.employeeId,
 				username: data.username,
 				email: data.email,
 				passwordHash,
@@ -146,14 +143,13 @@ router.post("/", requireRole("admin"), async (req, res, next) => {
 		});
 
 		res.status(201).json({
-			employeeId: user.employeeId,
 			username: user.username,
 			email: user.email,
 			firstName: user.firstName,
 			lastName: user.lastName,
 			fullName: user.fullName,
 			phoneNumber: user.phoneNumber || "",
-			roles: user.role,
+			role: user.role,
 			id: user.id,
 			isActive: user.isActive,
 		});
@@ -189,9 +185,7 @@ router.put("/:id", requireRole("admin"), async (req, res, next) => {
 						{ id: { not: id } },
 						{
 							OR: [
-								...(data.username
-									? [{ username: data.username }]
-									: []),
+								...(data.username ? [{ username: data.username }] : []),
 								...(data.email ? [{ email: data.email }] : []),
 							],
 						},
@@ -216,14 +210,13 @@ router.put("/:id", requireRole("admin"), async (req, res, next) => {
 		});
 
 		res.json({
-			employeeId: user.employeeId,
 			username: user.username,
 			email: user.email,
 			firstName: user.firstName,
 			lastName: user.lastName,
 			fullName: user.fullName,
 			phoneNumber: user.phoneNumber || "",
-			roles: user.role,
+			role: user.role,
 			id: user.id,
 			isActive: user.isActive,
 		});
@@ -272,7 +265,7 @@ router.get("/:id/customers", requireRole("admin"), async (req, res, next) => {
 		}
 
 		const { page, limit, sortBy, sortOrder, search, isActive } =
-			userFiltersSchema.parse(req.query);
+			customerFiltersSchema.parse(req.query);
 
 		const where = { userId };
 		if (search) {

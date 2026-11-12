@@ -79,6 +79,12 @@ class ApiClient {
 			timeout: 30000,
 		});
 
+		// Add platform header for admin blocking
+		this.client.interceptors.request.use((config) => {
+			config.headers['X-Platform'] = 'mobile'
+			return config
+		})
+
 		this.setupInterceptors();
 	}
 
