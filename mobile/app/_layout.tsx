@@ -18,20 +18,17 @@ export default function RootLayout() {
     }
   }, [token]);
 
-  // Determine initial route based on auth state
-  // This avoids navigation from index.tsx which causes "navigate before mount" errors
-  // (tabs) is a route group, so we navigate to the first tab route instead
-  const initialRouteName = isHydrated ? (token ? 'customers' : 'auth/login') : 'index';
-
   return (
     <Stack
       screenOptions={{
         headerShown: false,
         animation: 'fade',
       }}
-      initialRouteName={initialRouteName}
+      unstable_settings={{
+        initialRouteName: isHydrated ? (token ? '(tabs)/customers' : 'auth/login') : 'index',
+      }}
     >
-      <Stack.Screen name="index" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="index" options={{ presentation: 'card' }} />
       <Stack.Screen name="auth" options={{ presentation: 'modal' }} />
       <Stack.Screen name="(tabs)" options={{ presentation: 'card' }} />
     </Stack>

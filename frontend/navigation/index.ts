@@ -10,6 +10,11 @@ export default [
     to: '/users',
   },
   {
+    name: 'Customers',
+    icon: { name: 'ph-user-list-duotone', class: 'w-5 h-5' },
+    to: '/customers',
+  },
+  {
     name: 'Live Tracking',
     icon: { name: 'ph-radar-duotone', class: 'w-5 h-5' },
     to: '/tracking',

@@ -63,7 +63,7 @@ const placeholder = computed(() => {
 })
 
 const label = computed(() => {
-  return props.label ? props.label + (props.label && props.errors?.length ? '*' : '') : ''
+  return props.label ? props.label + (props.label && props.errors ? '*' : '') : ''
 })
 
 // Validation - Base-Dashboard pattern (like AppInputField)
@@ -132,8 +132,9 @@ const fetchData = async (searchTerm: string) => {
   try {
     const { data } = await axiosIns.get(props.getUrl, { params })
     emit('update:getResponse', data)
-    const items = Array.isArray(data) ? data : data.data || []
+    const items = Array.isArray(data) ? data : data.items || []
     fetchedItems.value = items
+    console.log(fetchedItems.value)
     return items
   } catch (err) {
     console.error('Fetch error:', err)

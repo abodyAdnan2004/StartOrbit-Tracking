@@ -61,7 +61,8 @@ const corsOptions = {
 			"http://127.0.0.1:3065",
 			"http://localhost:3000",
 			"http://10.0.2.2:3000", // Android emulator
-			"exp://127.0.0.1:8081", // Expo development
+			"exp://127.0.0.1:8081", // Expo development (local)
+			"exp://192.168.0.173:8081", // Expo development (mobile device)
 		];
 		// Allow requests with no origin (mobile apps, curl, etc.)
 		if (!origin || allowedOrigins.includes(origin)) {

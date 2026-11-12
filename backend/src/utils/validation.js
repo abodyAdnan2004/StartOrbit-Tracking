@@ -51,13 +51,15 @@ export const updateUserSchema = z.object({
 });
 
 // Customer validation schemas
+const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export const createCustomerSchema = z.object({
   name: z.string().min(1, 'Customer name is required').max(200),
   email: z.string().email('Invalid email address').optional().or(z.literal('')),
   phone: z.string().optional(),
   address: z.string().optional(),
   notes: z.string().optional(),
-  userId: z.number().int().positive('User ID is required'),
+  userId: z.string().regex(uuidRegex, 'Invalid user ID format').optional(),
 });
 
 export const updateCustomerSchema = z.object({
@@ -67,11 +69,11 @@ export const updateCustomerSchema = z.object({
   address: z.string().optional(),
   notes: z.string().optional(),
   isActive: z.boolean().optional(),
-  userId: z.number().int().positive().optional(),
+  userId: z.string().regex(uuidRegex, 'Invalid user ID format').optional(),
 });
 
 // Location validation schemas
-const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+// uuidRegex already defined above
 
 export const createLocationSchema = z.object({
   latitude: z.number().min(-90).max(90, 'Latitude must be between -90 and 90'),
@@ -109,6 +111,6 @@ export const userFiltersSchema = paginationSchema.extend({
 
 export const customerFiltersSchema = paginationSchema.extend({
   search: z.string().optional(),
-  userId: z.number().int().positive().optional(),
+  userId: z.string().regex(uuidRegex).optional(),
   isActive: z.boolean().optional(),
 });

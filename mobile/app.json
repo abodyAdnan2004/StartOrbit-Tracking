@@ -6,11 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#3B82F6"
-    },
+    "scheme": "orbittracking",
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -64,7 +60,9 @@
         {
           "icon": "./assets/notification-icon.png",
           "color": "#3B82F6",
-          "sounds": ["./assets/notification.wav"]
+          "sounds": [
+            "./assets/notification.wav"
+          ]
         }
       ]
     ],
@@ -72,7 +70,14 @@
       "typedRoutes": true
     },
     "extra": {
-      "apiUrl": "http://localhost:3000/api"
-    }
+      "apiUrl": "http://localhost:3000/api",
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "c40e48fd-77a2-49ec-a340-07b0938e7b4e"
+      }
+    },
+    "owner": "abodyadnan2004"
   }
 }

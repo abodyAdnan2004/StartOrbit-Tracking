@@ -6,7 +6,6 @@ import FlatPickr from 'vue-flatpickr-component'
 const props = defineProps<{
   label?: string
   placeholder?: string
-  required?: boolean
   size?: 'sm' | 'md' | 'lg'
   type?: 'text' | 'number' | 'email' | 'password' | 'date' | 'color' | 'time' | 'phoneNumber'
   errors?: ErrorObject[]
@@ -27,7 +26,7 @@ const inputType = computed(() => {
   return props.type ?? 'text'
 })
 
-const labelText = computed(() => (props.label ? props.label + (props.required ? '*' : '') : ''))
+const labelText = computed(() => (props.label ? props.label + (props.errors ? '*' : '') : ''))
 
 const error = computed(() =>
   props.errors?.length ? props.errors.map((e) => e.$message).join(', ') : ''
