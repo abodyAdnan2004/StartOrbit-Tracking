@@ -96,6 +96,18 @@ export const useAuthStore = defineStore('auth-store', () => {
     return userData.value.role === roleName
   }
 
+  const canAccessDashboard = computed(() =>
+    ['admin', 'viewer'].includes(userData.value?.role || '')
+  )
+
+  const canUseMobileApp = computed(
+    () => userData.value?.role === 'user' // ONLY 'user' role
+  )
+
+  const isViewer = computed(() => userData.value?.role === 'viewer')
+
+  const isAdmin = computed(() => userData.value?.role === 'admin')
+
   const logout = () => {
     token.value = ''
     tokenData.value = {} as Token
@@ -119,5 +131,9 @@ export const useAuthStore = defineStore('auth-store', () => {
     isLogged,
     me,
     hasRole,
+    canAccessDashboard,
+    canUseMobileApp,
+    isViewer,
+    isAdmin,
   }
 })

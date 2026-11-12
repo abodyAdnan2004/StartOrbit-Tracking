@@ -12,7 +12,6 @@ const store = useUserStore()
 
 const validator = new Validator<UserCreateDto>(
   {
-    employeeId: 0,
     username: '',
     email: '',
     password: '',
@@ -23,7 +22,6 @@ const validator = new Validator<UserCreateDto>(
     isActive: true,
   },
   {
-    employeeId: { required: requiredValidator('Employee ID') },
     username: {
       required: requiredValidator('Username'),
       minLength: minLengthValidator('Username', 3),
@@ -78,14 +76,6 @@ watch(
   <AppDialog v-model="store.isCreateDialogOpen" title="Create User" size="xl">
     <div class="flex flex-col gap-4 p-3">
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <AppInputField
-          v-model="body.employeeId.$model"
-          :errors="body.employeeId.$errors"
-          label="Employee ID"
-          type="number"
-          required
-          :min="1"
-        />
         <AppInputField
           v-model="body.username.$model"
           :errors="body.username.$errors"

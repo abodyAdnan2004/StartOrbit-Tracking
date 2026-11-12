@@ -11,7 +11,6 @@ export interface Role {
 
 // User DTO (what the API returns)
 export interface UserDto extends BaseDto {
-  employeeId: number
   username: string
   email: string
   firstName: string
@@ -24,7 +23,6 @@ export interface UserDto extends BaseDto {
 
 // Create payload
 export interface UserCreateDto {
-  employeeId: number
   username: string
   email: string
   password: string

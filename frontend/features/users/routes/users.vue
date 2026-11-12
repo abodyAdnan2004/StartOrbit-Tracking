@@ -53,10 +53,6 @@ onUnmounted(() => {
       </template>
 
       <AppTable title="Users" :headers="tableHeader()" :items="items" :is-loading="isLoading">
-        <template #data-employeeId="{ item }">
-          <span class="font-mono text-sm">{{ item.employeeId }}</span>
-        </template>
-
         <template #data-username="{ item }">
           <span class="font-medium">{{ item.username }}</span>
         </template>

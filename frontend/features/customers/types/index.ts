@@ -8,12 +8,17 @@ export interface CustomerDto extends BaseDto {
   phone: string | null
   address: string | null
   notes: string | null
+  status: 'pending' | 'approved' | 'cancelled'
+  statusTimestamps: {
+    pending: string
+    approved?: string
+    cancelled?: string
+  }
   isActive: boolean
-  userId: string
   user: {
     id: string
     fullName: string
-    username: string
+    username: string  // Keep for filter, not display
   }
 }
 
@@ -25,6 +30,9 @@ export interface CustomerCreateDto {
   address: string | null
   notes?: string | null
   userId: string | null
+  longitude?: number | null
+  latitude?: number | null
+  status?: 'pending' | 'approved' | 'cancelled'
 }
 
 // Update payload
@@ -37,11 +45,19 @@ export interface CustomerUpdateDto {
   notes?: string | null
   isActive?: boolean
   userId: string | null
+  longitude?: number | null
+  latitude?: number | null
+  status?: 'pending' | 'approved' | 'cancelled'
 }
 
 // Filters for listing customers
 export interface CustomerFilters extends BaseFilters {
   search: string | null
   userId?: string | null
+  userFullName?: string | null        // NEW
+  userUsername?: string | null        // NEW
   isActive?: boolean | null
+  status?: 'pending' | 'approved' | 'cancelled' | null
+  fromDate?: string | null
+  toDate?: string | null
 }

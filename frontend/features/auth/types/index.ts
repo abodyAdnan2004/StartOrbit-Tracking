@@ -12,15 +12,16 @@ export interface AuthResponse {
   token: Token
 }
 
+export type UserRole = 'admin' | 'user' | 'viewer'
+
 export interface User {
-  employeeId: number
   username: string
   email: string
   firstName: string
   lastName: string
   fullName: string
   phoneNumber: string
-  role: string
+  role: UserRole
   id: string
   isActive: boolean
 }

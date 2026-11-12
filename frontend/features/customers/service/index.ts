@@ -8,6 +8,7 @@ interface ICustomerService {
   create: (data: CustomerCreateDto) => Promise<CustomerDto>
   update: (id: string, data: CustomerUpdateDto) => Promise<CustomerDto>
   delete: (id: string) => Promise<void>
+  exportExcel: (filters?: Partial<CustomerFilters>) => Promise<Blob>
 }
 
 export class CustomerService implements ICustomerService {
@@ -35,6 +36,14 @@ export class CustomerService implements ICustomerService {
 
   async delete(id: string): Promise<void> {
     await axios.delete(`/customers/${id}`)
+  }
+
+  async exportExcel(filters?: Partial<CustomerFilters>): Promise<Blob> {
+    const response = await axios.get('/customers/export', {
+      params: filters,
+      responseType: 'blob'
+    })
+    return response.data
   }
 }
 
