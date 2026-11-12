@@ -16,7 +16,7 @@ export default [
   },
   {
     name: 'Live Tracking',
-    icon: { name: 'ph-radar-duotone', class: 'w-5 h-5' },
+    icon: { name: 'hugeicons:map-pinpoint-02', class: 'w-5 h-5' },
     to: '/tracking',
   },
 ]

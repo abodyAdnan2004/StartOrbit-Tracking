@@ -7,7 +7,7 @@ import { NotFoundError, ForbiddenError } from '../middleware/errorHandler.js';
 const router = express.Router();
 
 // GET /api/customers - Get all customers with pagination and filters
-router.get('/', requireRole('admin'), async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
     const { page, limit, sortBy, sortOrder, search, userId, isActive } = customerFiltersSchema.parse(req.query);
 

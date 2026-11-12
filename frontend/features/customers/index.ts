@@ -5,5 +5,6 @@ export const tableHeader = () => [
   { key: 'address', label: 'Address', sortable: false },
   { key: 'user', label: 'Assigned User', sortable: true },
   { key: 'isActive', label: 'Status', sortable: true },
+  { key: 'notes', label: 'Notes', sortable: true },
   { key: 'actions', label: 'Actions' },
 ]
