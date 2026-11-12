@@ -126,7 +126,7 @@ const initMap = () => {
   // Update markers when userLocations change
   watch(
     () => trackingStore.userLocations,
-    (locations) => {
+      (locations) => {
       updateMarkers(locations)
     },
     { deep: true }

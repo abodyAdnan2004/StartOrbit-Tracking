@@ -40,6 +40,7 @@ export const io = new Server(httpServer, {
 			"http://localhost:3000",
 			"http://10.0.2.2:3000", // Android emulator
 			"http://192.168.0.173:3000", // Mobile device
+			"http://localhost:8081", // Expo development (web)
 			"exp://192.168.0.126:8081", // Expo development (mobile device)
 			"exp://127.0.0.1:8081", // Expo development (local)
 			"exp://192.168.0.173:8081", // Expo development (mobile device)
@@ -64,6 +65,7 @@ const corsOptions = {
 			"http://localhost:3000",
 			"http://10.0.2.2:3000", // Android emulator
 			"http://192.168.0.173:3000", // Mobile device
+			"http://localhost:8081", // Expo development (web)
 			"exp://127.0.0.1:8081", // Expo development (local)
 			"exp://192.168.0.126:8081", // Expo development (mobile device)
 			"exp://192.168.0.173:8081", // Expo development (mobile device)

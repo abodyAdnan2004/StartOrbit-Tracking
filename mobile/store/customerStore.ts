@@ -6,7 +6,6 @@ interface CustomerState {
   customers: Customer[];
   isLoading: boolean;
   searchQuery: string;
-  filterUserId: string;
   error: string | null;
 
   // Actions
@@ -15,7 +14,6 @@ interface CustomerState {
   updateCustomer: (id: string, data: Partial<Customer>) => Promise<Customer>;
   deleteCustomer: (id: string) => Promise<void>;
   setSearchQuery: (query: string) => void;
-  setFilterUserId: (userId: string) => void;
   clearError: () => void;
 }
 
@@ -23,16 +21,12 @@ export const useCustomerStore = create<CustomerState>((set, get) => ({
   customers: [],
   isLoading: false,
   searchQuery: '',
-  filterUserId: '',
   error: null,
 
   loadCustomers: async () => {
     set({ isLoading: true, error: null });
     try {
-      const { filterUserId } = get();
-      const params = new URLSearchParams();
-      if (filterUserId) params.append('userId', filterUserId);
-      const response = await api.get<{ items: Customer[] }>(`/customers?${params.toString()}`);
+      const response = await api.get<{ items: Customer[] }>('/customers');
       set({ customers: response.data.items, isLoading: false });
     } catch (error: any) {
       set({ error: error.message || 'Failed to load customers', isLoading: false });
@@ -85,10 +79,6 @@ export const useCustomerStore = create<CustomerState>((set, get) => ({
 
   setSearchQuery: (query: string) => {
     set({ searchQuery: query });
-  },
-
-  setFilterUserId: (userId: string) => {
-    set({ filterUserId: userId });
   },
 
   clearError: () => {

@@ -16,15 +16,18 @@ export const setupSocketHandlers = (socket, io) => {
 				socket.disconnect();
 				return;
 			}
-
 			// Verify JWT
 			const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
 			// Get user from database
-			const user = await prisma.user.findUnique({
-				where: { id: decoded.userId },
-				include: { role: true },
-			});
+			let user;
+			try {
+				user = await prisma.user.findUnique({
+					where: { id: decoded.userId },
+				});
+			} catch (error) {
+				console.log(error);
+			}
 
 			if (!user || !user.isActive) {
 				socket.emit("auth:error", {
@@ -36,12 +39,12 @@ export const setupSocketHandlers = (socket, io) => {
 
 			// Store user info on socket
 			socket.userId = user.id;
-			socket.userRole = user.role.name;
+			socket.userRole = user.role;
 			socket.userName = user.fullName;
 
 			// Track socket mappings
 			socketUsers.set(socket.id, user.id);
-			socketRoles.set(socket.id, user.role.name);
+			socketRoles.set(socket.id, user.role);
 
 			if (!userSockets.has(user.id)) {
 				userSockets.set(user.id, new Set());
@@ -49,22 +52,22 @@ export const setupSocketHandlers = (socket, io) => {
 			userSockets.get(user.id).add(socket.id);
 
 			// Join role-based rooms for broadcasting
-			socket.join(`role:${user.role.name}`);
+			socket.join(`role:${user.role}`);
 			socket.join(`user:${user.id}`);
 
 			// Acknowledge authentication
 			socket.emit("auth:success", {
 				userId: user.id,
-				role: user.role.name,
+				role: user.role,
 				message: "Authenticated successfully",
 			});
 
 			console.log(
-				`User authenticated: ${user.fullName} (${user.role.name}) - Socket: ${socket.id}`,
+				`User authenticated: ${user.fullName} (${user.role}) - Socket: ${socket.id}`,
 			);
 
 			// Send current online users to admins/managers
-			if (["admin"].includes(user.role.name)) {
+			if (["admin"].includes(user.role)) {
 				const onlineUsers = await getOnlineUsers();
 				socket.emit("users:online", onlineUsers);
 			}

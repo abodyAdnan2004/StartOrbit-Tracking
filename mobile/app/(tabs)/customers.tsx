@@ -13,7 +13,6 @@ import {
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
-	Picker,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuthStore } from "@/store/authStore";
@@ -21,7 +20,7 @@ import { useCustomerStore } from "@/store/customerStore";
 import { Customer } from "@/types/customer";
 
 export default function CustomersScreen() {
-	const { token, user } = useAuthStore();
+	const { token, user, isHydrated } = useAuthStore();
 	const {
 		customers,
 		isLoading,
@@ -31,8 +30,8 @@ export default function CustomersScreen() {
 		deleteCustomer,
 		searchQuery,
 		setSearchQuery,
-		filterUserId,
-		setFilterUserId,
+		error: customerError,
+		clearError,
 	} = useCustomerStore();
 	const [refreshing, setRefreshing] = useState(false);
 	const [showAddModal, setShowAddModal] = useState(false);
@@ -49,11 +48,20 @@ export default function CustomersScreen() {
 	});
 	const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
+	// Don't render until hydrated
+	if (!isHydrated) {
+		return (
+			<View style={styles.loadingContainer}>
+				<ActivityIndicator size="large" color="#3B82F6" />
+			</View>
+		);
+	}
+
 	useEffect(() => {
 		if (token) {
 			loadCustomers();
 		}
-	}, [token, loadCustomers, filterUserId]);
+	}, [token, loadCustomers]);
 
 	const handleRefresh = async () => {
 		setRefreshing(true);
@@ -63,10 +71,9 @@ export default function CustomersScreen() {
 
 	const filteredCustomers = customers.filter(
 		(c) =>
-			(c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				c.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				c.phone?.includes(searchQuery)) &&
-			(!filterUserId || c.userId === filterUserId),
+			c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			c.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			c.phone?.includes(searchQuery),
 	);
 
 	const validateForm = () => {
@@ -79,7 +86,14 @@ export default function CustomersScreen() {
 	};
 
 	const resetForm = () => {
-		setFormData({ name: "", email: "", phone: "", address: "", notes: "", userId: user?.id || "" });
+		setFormData({
+			name: "",
+			email: "",
+			phone: "",
+			address: "",
+			notes: "",
+			userId: user?.id || "",
+		});
 		setFormErrors({});
 	};
 
@@ -211,27 +225,14 @@ export default function CustomersScreen() {
 				</View>
 			</View>
 
-			{/* Filter by User */}
-			<View style={styles.filterContainer}>
-				<Text style={styles.filterLabel}>Filter by User:</Text>
-				<Picker
-					selectedValue={filterUserId}
-					onValueChange={setFilterUserId}
-					style={styles.filterPicker}
-					itemStyle={styles.filterPickerItem}
-				>
-					<Picker.Item label="All Users" value="" />
-					{customers.map((customer) => (
-						customer.user && (
-							<Picker.Item
-								key={customer.user.id}
-								label={customer.user.fullName}
-								value={customer.user.id}
-							/>
-						)
-					))}
-				</Picker>
-			</View>
+			{customerError && (
+				<View style={styles.errorContainer}>
+					<Text style={styles.errorText}>{customerError}</Text>
+					<TouchableOpacity onPress={clearError} style={styles.errorDismiss}>
+						<Ionicons name="close-outline" size={18} color="#EF4444" />
+					</TouchableOpacity>
+				</View>
+			)}
 
 			<FlatList
 				data={filteredCustomers}
@@ -436,6 +437,7 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 		alignItems: "center",
 		paddingHorizontal: 20,
+		marginTop: 60,
 		paddingVertical: 16,
 		backgroundColor: "white",
 		borderBottomWidth: 1,
@@ -479,31 +481,6 @@ const styles = StyleSheet.create({
 	searchInput: {
 		flex: 1,
 		height: 44,
-		fontSize: 16,
-		color: "#111827",
-	},
-	filterContainer: {
-		paddingHorizontal: 16,
-		paddingVertical: 12,
-		backgroundColor: "white",
-		borderBottomWidth: 1,
-		borderBottomColor: "#E5E7EB",
-	},
-	filterLabel: {
-		fontSize: 14,
-		fontWeight: "500",
-		color: "#374151",
-		marginBottom: 8,
-	},
-	filterPicker: {
-		backgroundColor: "#F9FAFB",
-		borderRadius: 10,
-		borderWidth: 1,
-		borderColor: "#E5E7EB",
-		paddingHorizontal: 12,
-		paddingVertical: 8,
-	},
-	filterPickerItem: {
 		fontSize: 16,
 		color: "#111827",
 	},
@@ -689,5 +666,31 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		fontWeight: "600",
 		color: "white",
+	},
+	errorContainer: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		backgroundColor: "#FEF2F2",
+		borderWidth: 1,
+		borderColor: "#FECACA",
+		borderRadius: 8,
+		padding: 12,
+		marginHorizontal: 16,
+		marginTop: 8,
+	},
+	errorText: {
+		color: "#DC2626",
+		fontSize: 14,
+		flex: 1,
+	},
+	errorDismiss: {
+		padding: 4,
+	},
+	loadingContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "#F9FAFB",
 	},
 });

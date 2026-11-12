@@ -56,11 +56,19 @@ export const useAuthStore = create<AuthState>()(
 						password,
 						rememberMe,
 					})) as { data: AuthResponse };
-
 					const { user, token } = response.data;
 
+					// Normalize backend 'roles' to frontend 'role'
+					const normalizedUser =
+						user.roles !== undefined
+							? { ...user, role: user.roles }
+							: user;
+
+					console.log(normalizedUser);
+					console.log(token);
+
 					set({
-						user,
+						user: normalizedUser,
 						token: token.accessToken,
 						refreshToken: token.refreshToken,
 						isLoading: false,
@@ -97,11 +105,18 @@ export const useAuthStore = create<AuthState>()(
 				} catch (error) {
 					console.error("Logout error:", error);
 				} finally {
+					// Clear state
 					set({
 						user: null,
 						token: null,
 						refreshToken: null,
 					});
+					// Also clear AsyncStorage to ensure clean state
+					try {
+						await AsyncStorage.removeItem("auth-storage");
+					} catch (e) {
+						console.error("Failed to clear auth storage:", e);
+					}
 				}
 			},
 
@@ -115,8 +130,18 @@ export const useAuthStore = create<AuthState>()(
 					try {
 						const apiClient = await getApi();
 						const response = await apiClient.get("/auth/me");
-						set({ user: response.data.data });
+						// Normalize backend 'roles' to frontend 'role'
+						const userData = response.data.data;
+						const normalizedUser =
+							userData.roles !== undefined
+								? { ...userData, role: userData.roles }
+								: userData;
+						set({ user: normalizedUser });
 					} catch (error) {
+						console.error(
+							"Token validation failed during hydrate:",
+							error,
+						);
 						// Token invalid, clear auth
 						get().logout();
 					}
@@ -134,8 +159,14 @@ export const useAuthStore = create<AuthState>()(
 					})) as { data: AuthResponse };
 					const { user, token } = response.data;
 
+					// Normalize backend 'roles' to frontend 'role'
+					const normalizedUser =
+						user.roles !== undefined
+							? { ...user, role: user.roles }
+							: user;
+
 					set({
-						user,
+						user: normalizedUser,
 						token: token.accessToken,
 						refreshToken: token.refreshToken,
 					});
@@ -168,11 +199,6 @@ export const useAuthStore = create<AuthState>()(
 		},
 	),
 );
-
-// Initialize auth on app start
-export const initializeAuth = async () => {
-	await useAuthStore.getState().hydrate();
-};
 
 // Register the auth store getter for api.ts to use (breaks circular dependency)
 setAuthStoreGetter(() => ({

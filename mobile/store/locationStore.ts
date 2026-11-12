@@ -1,9 +1,10 @@
 import { create } from "zustand";
 import { io, Socket } from "socket.io-client";
-import { useAuthStore } from "./authStore";
 import { api } from "@/utils/api";
 import { Location as LocationType } from "@/types/location";
 import * as location from "expo-location";
+// Cleanup on app background/foreground
+import * as TaskManager from "expo-task-manager";
 
 interface LocationState {
 	// Current location
@@ -228,8 +229,7 @@ export const initializeSocket = (token: string) => {
 	// Socket will be created when startTracking is called
 };
 
-// Cleanup on app background/foreground
-import * as TaskManager from "expo-task-manager";
+
 
 // Background location task
 TaskManager.defineTask("background-location-task", async ({ data, error }) => {

@@ -1,19 +1,52 @@
 import { io, Socket } from 'socket.io-client';
 import { useAuthStore } from '@/store/authStore';
 import { useLocationStore } from '@/store/locationStore';
+import Constants from 'expo-constants';
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+// Get the API base URL from Expo config or environment
+// For mobile devices, we need to use the machine's IP, not localhost
+const getApiBaseUrl = (): string => {
+  // First check environment variable
+  if (process.env.EXPO_PUBLIC_API_URL) {
+    return process.env.EXPO_PUBLIC_API_URL.replace('/api', '');
+  }
+
+  // Try to get from Expo config (extra.apiUrl)
+  const extraApiUrl = Constants.expoConfig?.extra?.apiUrl;
+  if (extraApiUrl) {
+    return extraApiUrl.replace('/api', '');
+  }
+
+  // For Expo development, try to detect the host from the manifest URL
+  // This works when running on physical device via Expo Go
+  if (Constants.manifest2?.extra?.apiUrl) {
+    return Constants.manifest2.extra.apiUrl.replace('/api', '');
+  }
+
+  // Fallback: try to construct from the debugger host
+  // This works for iOS simulator and Android emulator
+  if (__DEV__ && Constants.manifest?.debuggerHost) {
+    const host = Constants.manifest.debuggerHost.split(':')[0];
+    return `http://${host}:3000`;
+  }
+
+  // Default fallback
+  return 'http://localhost:3000';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 let socket: Socket | null = null;
 
 export const initializeSocket = (token: string) => {
   if (socket?.connected) {
-    console.log('Socket already connected');
+    console.log('Socket already connected to:', API_BASE_URL);
     return socket;
   }
 
+  console.log('Initializing socket connection to:', API_BASE_URL);
+
   socket = io(API_BASE_URL, {
-    auth: { token },
     transports: ['websocket', 'polling'],
     reconnection: true,
     reconnectionAttempts: 10,
@@ -25,6 +58,8 @@ export const initializeSocket = (token: string) => {
 
   socket.on('connect', () => {
     console.log('Socket connected:', socket?.id);
+    // Send authentication token after connection
+    socket?.emit('authenticate', token);
     useLocationStore.getState().setOnlineStatus(true);
   });
 
@@ -34,7 +69,7 @@ export const initializeSocket = (token: string) => {
   });
 
   socket.on('connect_error', (error) => {
-    console.error('Socket connection error:', error);
+    console.error('Socket connection error:', error.message);
     useLocationStore.getState().setOnlineStatus(false);
   });
 

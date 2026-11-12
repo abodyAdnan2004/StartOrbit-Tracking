@@ -8,7 +8,8 @@ export interface User {
   lastName: string;
   fullName: string;
   phoneNumber: string;
-  role: string;
+  role: string;      // Frontend uses 'role'
+  roles?: string;    // Backend returns 'roles' (single role as string)
   isActive: boolean;
 }
 
