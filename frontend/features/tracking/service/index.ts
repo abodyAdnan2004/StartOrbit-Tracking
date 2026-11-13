@@ -1,62 +1,15 @@
 import axios from '~/common/services/app-client/axios'
-import type { PaginatedResponse } from '~/common/utils/types/ApiResponses'
-import type { LocationDto, LocationFilters, UserLocation, TrackingCustomer } from '../types'
 
-interface ILocationService {
-  get: (filters: LocationFilters) => Promise<PaginatedResponse<LocationDto>>
-  getLatest: () => Promise<{ items: UserLocation[] }>
-  getByUser: (userId: string, filters: LocationFilters) => Promise<PaginatedResponse<LocationDto>>
-  getDistanceStats: (userId: string, startDate?: string, endDate?: string) => Promise<{
-    userId: string
-    totalDistanceMeters: number
-    totalDistanceKm: string
-    estimatedSteps: number
-    locationCount: number
-    period: { start: string | null; end: string | null }
-  }>
-  getCustomers: (userId: string) => Promise<TrackingCustomer[]>
+interface ITrackingService {
+  // Real-time only via Socket.io - no REST endpoints
+  getCustomers: (userId: string) => Promise<any[]>
 }
 
-export class LocationService implements ILocationService {
-  async get(filters: LocationFilters): Promise<PaginatedResponse<LocationDto>> {
-    const response = await axios.get<PaginatedResponse<LocationDto>>('/locations', {
-      params: filters,
-    })
-    return response.data
-  }
-
-  async getLatest(): Promise<{ items: UserLocation[] }> {
-    const response = await axios.get<{ items: UserLocation[] }>('/locations/latest')
-    return response.data
-  }
-
-  async getByUser(userId: string, filters: LocationFilters): Promise<PaginatedResponse<LocationDto>> {
-    const response = await axios.get<PaginatedResponse<LocationDto>>(`/locations/user/${userId}`, {
-      params: filters,
-    })
-    return response.data
-  }
-
-  async getDistanceStats(userId: string, startDate?: string, endDate?: string): Promise<{
-    userId: string
-    totalDistanceMeters: number
-    totalDistanceKm: string
-    estimatedSteps: number
-    locationCount: number
-    period: { start: string | null; end: string | null }
-  }> {
-    const params: Record<string, string> = {}
-    if (startDate) params.startDate = startDate
-    if (endDate) params.endDate = endDate
-
-    const response = await axios.get(`/locations/stats/distance/${userId}`, { params })
-    return response.data
-  }
-
-  async getCustomers(userId: string): Promise<TrackingCustomer[]> {
-    const response = await axios.get<TrackingCustomer[]>(`/users/${userId}/customers`)
-    return response.data
+export class TrackingService implements ITrackingService {
+  async getCustomers(userId: string): Promise<any[]> {
+    const response = await axios.get(`/users/${userId}/customers`)
+    return response.data.items || response.data
   }
 }
 
-export const locationService = new LocationService()
+export const trackingService = new TrackingService()

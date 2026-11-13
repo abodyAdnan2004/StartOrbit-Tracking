@@ -1,9 +1,10 @@
 import axios from '~/common/services/app-client/axios'
-import type { AuthResponse, LoginBody, MeResponse } from '../types'
+import type { AuthResponse, LoginBody, MeResponse, Token } from '../types'
 
 interface IAuthService {
   login: (body: LoginBody) => Promise<AuthResponse>
   me: () => Promise<MeResponse>
+  refreshToken: (refreshToken: string) => Promise<AuthResponse>
 }
 
 export class AuthService implements IAuthService {
@@ -15,5 +16,10 @@ export class AuthService implements IAuthService {
   async me(): Promise<MeResponse> {
     const response = await axios.get<{ data: MeResponse }>('/Auth/me')
     return response.data.data
+  }
+
+  async refreshToken(refreshToken: string): Promise<AuthResponse> {
+    const response = await axios.post<AuthResponse>('/Auth/refresh', { refreshToken })
+    return response.data
   }
 }

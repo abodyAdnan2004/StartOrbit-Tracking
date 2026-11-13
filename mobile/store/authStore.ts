@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User, AuthResponse } from "@/types/auth";
 import { setAuthStoreGetter } from "@/utils/api";
+import { useRouter } from "expo-router";
 
 // Lazy import to avoid circular dependency
 let api: any = null;
@@ -52,10 +53,10 @@ export const useAuthStore = create<AuthState>()(
 				try {
 					const apiClient = await getApi();
 					const response = (await apiClient.post("/auth/login", {
-						loginIdentifier: email,  // email OR username
+						loginIdentifier: email, // email OR username
 						password,
 						rememberMe,
-						platform: 'mobile',  // Send platform hint
+						platform: "mobile", // Send platform hint
 					})) as { data: AuthResponse };
 					const { user, token } = response.data;
 
@@ -97,11 +98,13 @@ export const useAuthStore = create<AuthState>()(
 			},
 
 			logout: async () => {
+				
 				const { refreshToken } = get();
 				try {
 					if (refreshToken) {
 						const apiClient = await getApi();
 						await apiClient.post("/auth/logout", { refreshToken });
+						useRouter().replace("/auth/login");
 					}
 				} catch (error) {
 					console.error("Logout error:", error);

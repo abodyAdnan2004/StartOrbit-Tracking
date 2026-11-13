@@ -18,7 +18,6 @@ export const setupSocketHandlers = (socket, io) => {
 			}
 			// Verify JWT
 			const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
 			// Get user from database
 			let user;
 			try {
@@ -67,10 +66,8 @@ export const setupSocketHandlers = (socket, io) => {
 			);
 
 			// Send current online users to admins/viewers
-			if (["admin", "viewer"].includes(user.role)) {
-				const onlineUsers = await getOnlineUsers();
-				socket.emit("users:online", onlineUsers);
-			}
+			const onlineUsers = await getOnlineUsers();
+			socket.emit("users:online", onlineUsers);
 		} catch (error) {
 			console.error("Socket auth error:", error);
 			socket.emit("auth:error", { message: "Authentication failed" });
@@ -78,9 +75,20 @@ export const setupSocketHandlers = (socket, io) => {
 		}
 	});
 
-	// Handle location updates from mobile app (alternative to REST API)
-	socket.on("location:update", async (data) => {
+	// Handle location updates from mobile app
+	// Mobile emits: location:mobile-backend
+	// Backend re-emits to frontend: location:backend-frontend
+	socket.on("location:mobile-backend", async (data) => {
 		try {
+			console.log(
+				`Received location:mobile-backend from user ${socket.userId}:`,
+				{
+					latitude: data.latitude,
+					longitude: data.longitude,
+					accuracy: data.accuracy,
+				},
+			);
+
 			if (!socket.userId) {
 				socket.emit("location:error", { message: "Not authenticated" });
 				return;
@@ -127,21 +135,17 @@ export const setupSocketHandlers = (socket, io) => {
 				accuracy,
 				speed,
 				heading,
-				timestamp: new Date().toISOString(),  // Current time
+				timestamp: new Date().toISOString(),
 				customerId,
 			};
 
-			// Broadcast to user's own room (for multi-device sync)
-			io.to(`user:${socket.userId}`).emit(
-				"location:update",
-				locationData,
+			// Re-emit to frontend with dedicated event name
+			console.log(
+				`Broadcasting location:backend-frontend for user ${socket.userId}`,
 			);
+			io.emit("location:backend-frontend", locationData);
 
-			// Broadcast to admin/viewer rooms
-			io.to("role:admin").emit("location:update", locationData);
-			io.to("role:viewer").emit("location:update", locationData);  // ADD viewer
-
-			// Acknowledge receipt
+			// Acknowledge receipt to mobile
 			socket.emit("location:ack", {
 				timestamp: locationData.timestamp,
 			});
@@ -191,16 +195,14 @@ export const setupSocketHandlers = (socket, io) => {
 				accuracy,
 				speed,
 				heading,
-				timestamp: timestamp ? new Date(timestamp).toISOString() : new Date().toISOString(),
+				timestamp: timestamp
+					? new Date(timestamp).toISOString()
+					: new Date().toISOString(),
 				customerId,
 			};
 
-			io.to(`user:${socket.userId}`).emit(
-				"location:update",
-				locationData,
-			);
-			io.to("role:admin").emit("location:update", locationData);
-			io.to("role:viewer").emit("location:update", locationData);
+			// Re-emit to frontend
+			io.emit("location:backend-frontend", locationData);
 
 			socket.emit("location:batch:ack", {
 				count: locations.length,
@@ -211,6 +213,13 @@ export const setupSocketHandlers = (socket, io) => {
 				message: "Failed to process batch locations",
 			});
 		}
+	});
+
+	// Join a room (e.g., "tracking" for all location updates)
+	socket.on("join:room", (roomName) => {
+		if (!socket.userId) return;
+		socket.join(roomName);
+		console.log(`User ${socket.userId} joined room: ${roomName}`);
 	});
 
 	// Subscribe to specific user's location (for frontend map)
@@ -261,9 +270,6 @@ export const setupSocketHandlers = (socket, io) => {
 				sockets.delete(socket.id);
 				if (sockets.size === 0) {
 					userSockets.delete(userId);
-					// Notify admins/viewers user went offline
-					io.to("role:admin").emit("user:offline", { userId });
-					io.to("role:viewer").emit("user:offline", { userId });
 				}
 			}
 		}
@@ -276,7 +282,7 @@ export const setupSocketHandlers = (socket, io) => {
 // Helper to get online users with their latest location (IN-MEMORY ONLY)
 async function getOnlineUsers() {
 	const onlineUserIds = Array.from(userSockets.keys());
-
+	console.log(onlineUserIds);
 	if (onlineUserIds.length === 0) return [];
 
 	const users = await prisma.user.findMany({
@@ -291,9 +297,9 @@ async function getOnlineUsers() {
 
 	// NO location history query - Real-time only
 	// Location data will be received via real-time events
-	return users.map(user => ({
+	return users.map((user) => ({
 		...user,
-		location: null,  // Will be received via real-time events
+		location: null, // Will be received via real-time events
 		isOnline: true,
 	}));
 }

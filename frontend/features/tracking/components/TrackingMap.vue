@@ -18,7 +18,7 @@ import L, {
 import 'leaflet/dist/leaflet.css'
 // Import locate control
 import 'leaflet.locatecontrol/dist/L.Control.Locate.css'
-import { locate } from 'leaflet.locatecontrol'
+import { LocateControl } from 'leaflet.locatecontrol'
 
 const trackingStore = useTrackingStore()
 const authStore = useAuthStore()
@@ -98,10 +98,10 @@ const initMap = () => {
     attribution:
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19,
-  }).addTo(map.value!)
+  }).addTo(map.value! as L.Map)
 
   // Add locate control
-  const locateControl = locate({
+  const locateControl = new LocateControl({
     position: 'topright',
     strings: {
       title: 'Show me where I am',
@@ -110,7 +110,7 @@ const initMap = () => {
       enableHighAccuracy: true,
     },
   })
-  locateControl.addTo(map.value!)
+  locateControl.addTo(map.value! as L.Map)
 
   // Watch for map config changes
   watch(
@@ -126,17 +126,25 @@ const initMap = () => {
   // Update markers when userLocations change
   watch(
     () => trackingStore.userLocations,
-      (locations) => {
+    (locations) => {
       updateMarkers(locations)
     },
     { deep: true }
   )
 
   // Update current user location marker
+  let hasCenteredOnUser = false
   watch(
     () => trackingStore.currentLocation,
     (location) => {
       updateCurrentUserMarker(location)
+      // Auto-center on current user when first location is received
+      if (location && !hasCenteredOnUser && map.value) {
+        hasCenteredOnUser = true
+        map.value.setView([location.latitude, location.longitude], trackingStore.mapConfig.zoom, {
+          animate: true,
+        })
+      }
     },
     { deep: true }
   )
@@ -150,7 +158,7 @@ const updateMarkers = (locations: UserLocation[]) => {
 
   userMarkers.value.forEach((marker, userId) => {
     if (!currentUserIds.has(userId)) {
-      map.value?.removeLayer(marker)
+      map.value?.removeLayer(marker as any)
       userMarkers.value.delete(userId)
     }
   })
@@ -158,7 +166,7 @@ const updateMarkers = (locations: UserLocation[]) => {
   // Remove accuracy circles for users no longer in the list
   accuracyCircles.value.forEach((circle, userId) => {
     if (!currentUserIds.has(userId)) {
-      map.value?.removeLayer(circle)
+      map.value?.removeLayer(circle as any)
       accuracyCircles.value.delete(userId)
     }
   })
@@ -218,7 +226,7 @@ const updateMarkers = (locations: UserLocation[]) => {
       // Remove accuracy circle if no accuracy
       const circle = accuracyCircles.value.get(location.userId)
       if (circle) {
-        map.value?.removeLayer(circle)
+        map.value?.removeLayer(circle as any)
         accuracyCircles.value.delete(location.userId)
       }
     }
@@ -396,7 +404,7 @@ onMounted(() => {
     </div>
 
     <!-- Current user info -->
-    <div class="absolute bottom-4 left-4 z-1000 ` max-w-xs">
+    <div class="z-1000 absolute bottom-4 left-4 max-w-xs">
       <div class="rounded-lg bg-white/95 p-3 shadow-lg">
         <div class="mb-2 flex items-center gap-2">
           <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500">
@@ -440,10 +448,10 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- User list panel (admin/manager) -->
+    <!-- User list panel (admin/viewer) -->
     <div
       class="absolute bottom-4 right-4 z-10 max-h-96 w-64"
-      v-if="authStore.userData?.role === 'admin'"
+      v-if="['admin', 'viewer'].includes(authStore.userData?.role || '')"
     >
       <div class="overflow-hidden rounded-lg bg-white/95 shadow-lg">
         <div class="flex items-center justify-between border-b px-3 py-2">
@@ -484,7 +492,7 @@ onMounted(() => {
     <div
       class="absolute"
       style="bottom: 1rem; right: 1rem; z-index: 1000"
-      v-if="!(authStore.userData?.role === 'admin')"
+      v-if="!['admin', 'viewer'].includes(authStore.userData?.role || '')"
     >
       <div class="flex flex-col gap-2 rounded-lg bg-white/95 p-3 shadow-lg">
         <div class="flex items-center gap-2">

@@ -67,21 +67,6 @@ export const initializeSocket = (token: string) => {
     onAuthErrorCallback?.();
   });
 
-  // Listen for location updates from other users (for admin/manager)
-  socket.on('location:update', (data) => {
-    console.log('Received location update:', data);
-    // This would be used in the dashboard/frontend, not mobile
-  });
-
-  // Listen for user online/offline status
-  socket.on('user:online', (data) => {
-    console.log('User online:', data);
-  });
-
-  socket.on('user:offline', (data) => {
-    console.log('User offline:', data);
-  });
-
   return socket;
 };
 
@@ -102,7 +87,7 @@ export interface SocketEvents {
   'authenticate': (token: string) => void;
   'auth:success': (data: { userId: string; role: string; message: string }) => void;
   'auth:error': (data: { message: string }) => void;
-  'location:update': (data: LocationUpdateData) => void;
+  'location:mobile-backend': (data: LocationUpdateData) => void;
   'location:batch': (locations: LocationUpdateData[]) => void;
   'location:ack': (data: { id: string; timestamp: Date }) => void;
   'location:batch:ack': (data: { count: number; ids: string[] }) => void;

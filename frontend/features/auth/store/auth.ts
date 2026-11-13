@@ -72,7 +72,7 @@ export const useAuthStore = defineStore('auth-store', () => {
         console.log(response.message || 'Login failed')
       }
     } catch (error) {
-      console.log( error)
+      console.log(error)
     } finally {
       isLoading.value = false
     }
@@ -120,6 +120,30 @@ export const useAuthStore = defineStore('auth-store', () => {
     navigateTo('/login')
   }
 
+  const refreshAccessToken = async () => {
+    try {
+      if (!tokenData.value.refreshToken) {
+        throw new Error('No refresh token available')
+      }
+
+      isLoading.value = true
+      const response = await authService.refreshToken(tokenData.value.refreshToken)
+
+      if (response.isSuccess) {
+        token.value = response.token.accessToken
+        tokenData.value = response.token
+        return response.token.accessToken
+      } else {
+        throw new Error(response.message || 'Token refresh failed')
+      }
+    } catch (error) {
+      console.error('Token refresh failed:', error)
+      throw error
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     isLoading,
     token,
@@ -135,5 +159,6 @@ export const useAuthStore = defineStore('auth-store', () => {
     canUseMobileApp,
     isViewer,
     isAdmin,
+    refreshAccessToken,
   }
 })

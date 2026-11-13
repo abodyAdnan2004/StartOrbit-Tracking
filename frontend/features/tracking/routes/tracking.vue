@@ -7,21 +7,8 @@ definePageMeta({ title: 'Live Tracking' })
 const trackingStore = useTrackingStore()
 const authStore = useAuthStore()
 
-onMounted(() => {
-  // Initialize tracking store
-  if (authStore.token) {
-    if (authStore.userData.role === 'admin') {
-      trackingStore.loadLatestLocations()
-    } else {
-      trackingStore.loadCustomers()
-      trackingStore.loadDistanceStats()
-    }
-  }
-})
-
-onUnmounted(() => {
-  // Cleanup if needed
-})
+// Socket initialization is now handled automatically by the store
+// for all authenticated users (admin/viewer see all, regular users see own)
 </script>
 
 <template>

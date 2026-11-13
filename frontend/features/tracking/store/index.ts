@@ -1,79 +1,53 @@
-import { locationService } from '../service'
-import type {
-  LocationDto,
-  LocationFilters,
-  UserLocation,
-  TrackingCustomer,
-  MapConfig,
-} from '../types'
+import { useAuthStore } from '~/features/auth/store/auth'
 import { io, Socket } from 'socket.io-client'
+import type { MapConfig, UserLocation } from '../types'
 
 export const useTrackingStore = defineStore('tracking', () => {
   const authStore = useAuthStore()
 
-  // Current user's location
-  const currentLocation = ref<UserLocation | null>(null)
-
-  // All online users' locations
+  // All online users' locations (real-time only)
   const userLocations = ref<UserLocation[]>([])
-
-  // Location history
-  const locationHistory = ref<LocationDto[]>([])
-  const historyLoading = ref(false)
-  const historyTotalPages = ref(0)
-
-  // Customers for tracking
-  const customers = ref<TrackingCustomer[]>([])
-  const customersLoading = ref(false)
-
-  // Distance stats
-  const distanceStats = ref<{
-    totalDistanceMeters: number
-    totalDistanceKm: string
-    estimatedSteps: number
-    locationCount: number
-  } | null>(null)
-
-  // Filters
-  const filters = ref<LocationFilters>({
-    pageNumber: 1,
-    pageSize: 50,
-    userId: null,
-    customerId: null,
-    startDate: null,
-    endDate: null,
-  })
-
-  // Map configuration
-    const mapConfig = ref<MapConfig>({
-      center: [33.3128, 44.3615] as [number, number], // Default to NYC
-      zoom: 13,
-      maxZoom: 19,
-      minZoom: 2,
-    })
-
-  // Socket connection
-  let socket: Socket | null = null
   const isConnected = ref(false)
+  // Current user's own location (for users with 'user' role)
+  const currentLocation = ref<UserLocation | null>(null)
+  // Map configuration
+  const mapConfig = reactive<MapConfig>({
+    center: [33.3128, 44.3615] as [number, number],
+    zoom: 13,
+    maxZoom: 19,
+    minZoom: 2,
+  })
+  let socket: Socket | null = null
+  let isInitialized = false
 
-  // Initialize socket connection
+  // Socket initialization
   const initSocket = () => {
-    if (!authStore.token) return
+    // Prevent multiple initializations
+    if (isInitialized && socket?.connected) {
+      console.log('Socket already initialized and connected')
+      return
+    }
 
-    const wsUrl = `http://localhost:3000`
+    const wsUrl = import.meta.env.VITE_BASE_URL || 'http://localhost:3000'
+    console.log('Initializing socket connection to:', wsUrl)
+
     socket = io(wsUrl, {
-      auth: {
-        token: authStore.token,
-      },
+      auth: { token: authStore.token },
       transports: ['websocket', 'polling'],
       reconnection: true,
-      reconnectionDelay: 5000,
-      reconnectionAttempts: Infinity,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 20000,
+      autoConnect: true,
     })
-
     socket.on('connect', () => {
-      console.log('Socket connected')
+      console.log('Socket connected:', socket?.id)
       isConnected.value = true
+      isInitialized = true
+
+      console.log('online-users emited')
+      socket?.emit('get:online-users')
     })
 
     socket.on('disconnect', (reason) => {
@@ -82,36 +56,56 @@ export const useTrackingStore = defineStore('tracking', () => {
     })
 
     socket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error)
+      console.error('Socket connection error:', error.message)
+      isConnected.value = false
     })
 
-    socket.on('auth:success', () => {
-      console.log('Socket authenticated')
-    })
-
-    socket.on('location:update', (data: UserLocation) => {
-      updateUserLocation(data)
-    })
-
-    socket.on('user:online', (data) => {
-      console.log('User online:', data)
+    socket.on('location:backend-frontend', (data: UserLocation) => {
+      try {
+        console.log('Received location update from backend:', data.userId, data.userName)
+        console.log('Received location:', data)
+        if (data.userId === authStore.userData?.id) {
+          currentLocation.value = data
+        }
+        updateUserLocation(data)
+      } catch (error) {
+        console.log(error)
+      }
     })
 
     socket.on('user:offline', (data) => {
-      console.log('User offline:', data)
+      console.log('User went offline:', data.userId)
       removeUserLocation(data.userId)
+    })
+
+    socket.on('users:online', (users: UserLocation[]) => {
+      console.log('Received online users:', users.length)
+      users.forEach((u) => updateUserLocation(u))
+    })
+
+    socket.on('auth:success', (data) => {
+      console.log('Socket authenticated:', data)
+    })
+
+    socket.on('auth:error', (data) => {
+      console.error('Socket auth error:', data)
+      // Token might be expired - try to refresh or logout
+      // Note: refreshAccessToken might not exist on authStore, using logout as fallback
+      try {
+        if (typeof authStore.refreshAccessToken === 'function') {
+          authStore.refreshAccessToken().catch(() => {
+            authStore.logout()
+          })
+        } else {
+          authStore.logout()
+        }
+      } catch {
+        authStore.logout()
+      }
     })
   }
 
   const updateUserLocation = (data: UserLocation) => {
-    // Update current user's location
-    if (data.userId === authStore.userData.id) {
-      currentLocation.value = data
-      // Update map center
-      mapConfig.value.center = [data.latitude, data.longitude]
-    }
-
-    // Update user locations list
     const index = userLocations.value.findIndex((u) => u.userId === data.userId)
     if (index >= 0) {
       userLocations.value[index] = data
@@ -124,100 +118,19 @@ export const useTrackingStore = defineStore('tracking', () => {
     userLocations.value = userLocations.value.filter((u) => u.userId !== userId)
   }
 
-  // Fetch current user's customers
-  const loadCustomers = async () => {
-    if (!authStore.userData.id) return
-    try {
-      customersLoading.value = true
-      customers.value = await locationService.getCustomers(authStore.userData.id)
-    } catch (error) {
-      console.error('Failed to load customers:', error)
-    } finally {
-      customersLoading.value = false
-    }
-  }
-
-  // Load location history
-  const loadHistory = async (page = 1) => {
-    if (!authStore.userData.id) return
-    try {
-      historyLoading.value = true
-      filters.value.pageNumber = page
-      const response = await locationService.getByUser(authStore.userData.id, filters.value)
-      if (page === 1) {
-        locationHistory.value = response.items
-      } else {
-        locationHistory.value = [...locationHistory.value, ...response.items]
-      }
-      historyTotalPages.value = response.calculatedTotalPages
-    } catch (error) {
-      console.error('Failed to load history:', error)
-    } finally {
-      historyLoading.value = false
-    }
-  }
-
-  // Load distance stats
-  const loadDistanceStats = async (startDate?: string, endDate?: string) => {
-    if (!authStore.userData.id) return
-    try {
-      distanceStats.value = await locationService.getDistanceStats(
-        authStore.userData.id,
-        startDate,
-        endDate
-      )
-    } catch (error) {
-      console.error('Failed to load distance stats:', error)
-    }
-  }
-
-  // Load latest locations for all users (for admin/manager)
-  const loadLatestLocations = async () => {
-    try {
-      const response = await locationService.getLatest()
-      userLocations.value = response.items
-    } catch (error) {
-      console.error('Failed to load latest locations:', error)
-    }
-  }
-
+  // Initialize socket for all authenticated users (not just admin/viewer)
+  // Admin/viewer will see all users, regular users will see their own location
   onMounted(() => {
     if (authStore.token) {
       initSocket()
-      if (authStore.userData.role === 'admin') {
-        loadLatestLocations()
-      } else {
-        loadCustomers()
-        loadDistanceStats()
-      }
     }
   })
 
   onUnmounted(() => {
-    if (socket) {
-      socket.disconnect()
-      socket = null
-    }
+    socket?.disconnect()
+    socket = null
+    isInitialized = false
   })
 
-  return {
-    // State
-    currentLocation,
-    userLocations,
-    locationHistory,
-    historyLoading,
-    historyTotalPages,
-    customers,
-    customersLoading,
-    distanceStats,
-    filters,
-    mapConfig,
-    isConnected,
-    // Actions
-    initSocket,
-    loadCustomers,
-    loadHistory,
-    loadDistanceStats,
-    loadLatestLocations,
-  }
+  return { userLocations, isConnected, initSocket, currentLocation, mapConfig }
 })
