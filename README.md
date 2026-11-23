@@ -5,7 +5,7 @@ Real-time location tracking system with a web dashboard, backend API, and mobile
 ## 🏗️ Architecture
 
 ```
-┌─────────────────┐     WebSocket      ┌─────────────────┐
+┌─────────────────┐     WebSocket       ┌─────────────────┐
 │  Mobile App     │ ◄─────────────────► │  Backend API    │
 │  (React Native) │   Location Updates  │  (Node.js/      │
 │  - Login        │                     │   Express)      │

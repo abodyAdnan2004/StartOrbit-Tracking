@@ -8,7 +8,7 @@ import {
 	Platform,
 	TouchableOpacity,
 } from "react-native";
-import MapView, { Marker, Callout, Circle } from "react-native-maps";
+import { MapView, Marker, Callout, Circle } from "@/components/map";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { useAuthStore } from "@/store/authStore";
@@ -39,9 +39,16 @@ export default function TrackingScreen() {
 	// Auto-start tracking when screen mounts
 	useEffect(() => {
 		if (token) {
-			checkPermissionsAndStart();
-			// Also get current position for initial map region
-			getCurrentPositionForMap();
+			if (Platform.OS === "web") {
+				// On web, use startTrackingWeb which uses browser Geolocation API
+				useLocationStore.getState().startTrackingWeb(token);
+				// Also get current position for initial map region
+				getCurrentPositionForMap();
+			} else {
+				checkPermissionsAndStart();
+				// Also get current position for initial map region
+				getCurrentPositionForMap();
+			}
 		}
 		return () => {
 			// Cleanup on unmount
@@ -354,6 +361,7 @@ const styles = StyleSheet.create({
 		elevation: 6,
 		borderWidth: 1,
 		borderColor: "#E5E7EB",
+		zIndex: 1000,
 	},
 	infoRow: {
 		flexDirection: "row",

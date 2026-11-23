@@ -1,14 +1,20 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import TrackingMap from '~/features/tracking/components/TrackingMap.vue'
 import { useTrackingStore } from '~/features/tracking/store'
+import { useAuthStore } from '~/features/auth/store/auth'
 
 definePageMeta({ title: 'Live Tracking' })
 
 const trackingStore = useTrackingStore()
 const authStore = useAuthStore()
 
-// Socket initialization is now handled automatically by the store
-// for all authenticated users (admin/viewer see all, regular users see own)
+// Ensure socket is initialized when page mounts
+onMounted(() => {
+  if (authStore.token) {
+    trackingStore.initSocket()
+  }
+})
 </script>
 
 <template>
@@ -24,7 +30,7 @@ const authStore = useAuthStore()
         <div class="flex items-center gap-2 rounded-full bg-gray-50 px-3 py-1.5">
           <span
             class="h-2 w-2 rounded-full"
-            :class="trackingStore.isConnected ? 'animate-pulse bg-green-500' : 'bg-red-500'"
+            :class="trackingStore.isConnected ? 'animate-pulse bg-success-500' : 'bg-red-500'"
           />
           <span class="text-sm font-medium text-gray-700">
             {{ trackingStore.isConnected ? 'Live' : 'Offline' }}
@@ -43,7 +49,7 @@ const authStore = useAuthStore()
     </header>
 
     <!-- Main content -->
-    <main class="relative flex min-h-0 flex-1">
+    <main class="flex min-h-0 flex-1 flex-col">
       <TrackingMap />
     </main>
   </div>

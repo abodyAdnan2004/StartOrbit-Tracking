@@ -81,6 +81,7 @@ const corsOptions = {
 	allowedHeaders: [
 		"Content-Type",
 		"Authorization",
+		"x-platform",
 		"access-control-allow-methods",
 		"access-control-allow-headers",
 		"access-control-allow-origin",

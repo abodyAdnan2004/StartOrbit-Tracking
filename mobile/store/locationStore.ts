@@ -7,6 +7,7 @@ import {
 } from "@/utils/socket";
 import * as location from "expo-location";
 import { useAuthStore } from "@/store/authStore";
+import { Platform } from "react-native";
 
 interface LocationType {
 	id: string;
@@ -36,6 +37,7 @@ interface LocationState {
 
 	// Actions
 	startTracking: (token: string) => Promise<void>;
+	startTrackingWeb: (token: string) => Promise<void>;
 	stopTracking: () => void;
 	sendLocation: (location: LocationType) => Promise<void>;
 	setOnlineStatus: (online: boolean) => void;
@@ -43,6 +45,7 @@ interface LocationState {
 }
 
 let watchId: location.LocationSubscription | null = null;
+let webWatchId: number | null = null;
 
 // Set up socket callbacks once when store is created
 setSocketCallbacks({
@@ -129,11 +132,84 @@ export const useLocationStore = create<LocationState>((set, get) => ({
 		}
 	},
 
+	startTrackingWeb: async (token: string) => {
+		try {
+			// Initialize socket connection using shared utility
+			initializeSocket(token);
+
+			// Check if geolocation is available
+			if (!navigator.geolocation) {
+				throw new Error("Geolocation is not supported by this browser");
+			}
+
+			// Start watching location using browser's Geolocation API
+			webWatchId = navigator.geolocation.watchPosition(
+				(position: GeolocationPosition) => {
+					const socket = getSocket();
+					const { user } = useAuthStore.getState();
+
+					// Ensure user is authenticated
+					if (!user?.id) {
+						console.warn(
+							"No user ID available, skipping location update",
+						);
+						return;
+					}
+
+					const locationData: LocationType = {
+						id:
+							position.coords.latitude.toString() +
+							position.coords.longitude.toString() +
+							Date.now().toString(),
+						userId: user.id,
+						latitude: position.coords.latitude,
+						longitude: position.coords.longitude,
+						altitude: position.coords.altitude ?? undefined,
+						accuracy: position.coords.accuracy ?? undefined,
+						speed: position.coords.speed ?? undefined,
+						heading: position.coords.heading ?? undefined,
+						timestamp: new Date(position.timestamp),
+						metadata: {
+							source: "web",
+						},
+					};
+
+					get().sendLocation(locationData);
+				},
+				(error: GeolocationPositionError) => {
+					console.error("Geolocation error:", error.message);
+					set({ error: error.message || "Failed to get location" });
+				},
+				{
+					enableHighAccuracy: true,
+					timeout: 10000,
+					maximumAge: 0,
+				},
+			);
+
+			set({
+				isTracking: true,
+				error: null,
+			});
+
+			console.log("Web tracking started");
+		} catch (error: any) {
+			set({ error: error.message || "Failed to start web tracking" });
+			throw error;
+		}
+	},
+
 	stopTracking: () => {
-		// Stop location watching
+		// Stop native location watching
 		if (watchId) {
 			watchId.remove();
 			watchId = null;
+		}
+
+		// Stop web location watching
+		if (webWatchId !== null) {
+			navigator.geolocation.clearWatch(webWatchId);
+			webWatchId = null;
 		}
 
 		// Disconnect socket using shared utility

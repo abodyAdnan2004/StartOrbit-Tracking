@@ -292,7 +292,7 @@ export default function SettingsScreen() {
 				</TouchableOpacity>
 
 				<View style={styles.footer}>
-					<Text style={styles.footerText}>Orbit Tracking © 2024</Text>
+					<Text style={styles.footerText}>Orbit Tracking © 2026</Text>
 				</View>
 			</ScrollView>
 		</SafeAreaView>

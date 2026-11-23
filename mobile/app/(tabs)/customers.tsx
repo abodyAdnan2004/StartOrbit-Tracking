@@ -15,7 +15,7 @@ import {
 	ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import MapView, { Marker, Callout } from "react-native-maps";
+import { MapView, Marker, Callout } from "@/components/map";
 import { useAuthStore } from "@/store/authStore";
 import { useCustomerStore } from "@/store/customerStore";
 import {

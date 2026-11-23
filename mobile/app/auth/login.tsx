@@ -47,8 +47,8 @@ export default function LoginScreen() {
 
 		try {
 			await login(
-				"john.doe@orbit-tracking.com",
-				"password123",
+				email ?? "john.doe@orbit-tracking.com",
+				password ?? "password123",
 				rememberMe,
 			);
 			router.replace("/customers");
